@@ -304,6 +304,15 @@
         background: rgba(52, 211, 153, 0.9);
         box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.25);
       }
+      .sync-indicator[data-state="synced"] {
+        background: rgba(52, 211, 153, 0.12);
+        color: #6ee7b7;
+        border-color: rgba(52, 211, 153, 0.4);
+      }
+      .sync-indicator[data-state="synced"]::before {
+        background: rgba(52, 211, 153, 0.95);
+        box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.25);
+      }
       .sync-indicator[data-state="syncing"] {
         background: rgba(var(--brand-accent-rgb), 0.12);
         color: var(--brand-accent);
@@ -1288,7 +1297,7 @@
         const Database = (() => {
           const STORE_NAMES = ["bookings", "invoices", "payments", "settings"];
           const DB_NAME = "zantra_console_v1";
-          const DB_VERSION = 1;
+          const DB_VERSION = 2;
           const isSupported = typeof indexedDB !== "undefined";
 
           const memoryStores = STORE_NAMES.reduce((acc, name) => {
@@ -1297,6 +1306,16 @@
           }, new Map());
 
           let openPromise = null;
+
+          const ensureStoreIndexes = (store) => {
+            if (!store) return;
+            if (!store.indexNames.contains("dirty")) {
+              store.createIndex("dirty", "dirty", { unique: false });
+            }
+            if (!store.indexNames.contains("updatedAt")) {
+              store.createIndex("updatedAt", "updatedAt", { unique: false });
+            }
+          };
 
           const openDb = () => {
             if (!isSupported) return Promise.resolve(null);
@@ -1308,12 +1327,15 @@
               };
               request.onupgradeneeded = (event) => {
                 const db = event.target.result;
+                const upgradeTransaction = event.target.transaction || request.transaction;
                 STORE_NAMES.forEach((name) => {
+                  let store = null;
                   if (!db.objectStoreNames.contains(name)) {
-                    const store = db.createObjectStore(name, { keyPath: "id" });
-                    store.createIndex("dirty", "dirty", { unique: false });
-                    store.createIndex("updatedAt", "updatedAt", { unique: false });
+                    store = db.createObjectStore(name, { keyPath: "id" });
+                  } else if (upgradeTransaction) {
+                    store = upgradeTransaction.objectStore(name);
                   }
+                  ensureStoreIndexes(store);
                 });
               };
               request.onsuccess = () => {
@@ -1567,6 +1589,20 @@
                 memory.settings.dirty = false;
                 await Database.put("settings", memory.settings);
               }
+              const persistOps = [];
+              if (memory.bookings.length) {
+                persistOps.push(Database.putMany("bookings", memory.bookings));
+              }
+              if (memory.invoices.length) {
+                persistOps.push(Database.putMany("invoices", memory.invoices));
+              }
+              if (memory.payments.length) {
+                persistOps.push(Database.putMany("payments", memory.payments));
+              }
+              persistOps.push(Database.put("settings", memory.settings));
+              await Promise.all(persistOps).catch((error) => {
+                console.warn("Failed to normalize stored records", error);
+              });
               Theme.setAccent(memory.settings.color || defaultState.settings.color);
             } catch (error) {
               console.error("Failed to load local data", error);
