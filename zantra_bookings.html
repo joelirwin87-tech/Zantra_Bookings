@@ -31,6 +31,21 @@
     </script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js"></script>
+    <script>
+      const supabaseUrl = "https://imqnxsrdwkgvjojsowj.supabase.co";
+      const supabaseKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdX...";
+      const supabaseClient =
+        typeof window !== "undefined" && window.supabase
+          ? window.supabase.createClient(supabaseUrl, supabaseKey)
+          : null;
+      if (supabaseClient) {
+        window.supabaseClient = supabaseClient;
+      } else {
+        console.error("Supabase client failed to initialize.");
+      }
+    </script>
 
     <style>
       :root {
@@ -267,6 +282,61 @@
         display: flex;
         gap: 0.75rem;
       }
+      .sync-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.16);
+        color: var(--slate-300);
+        font-size: 0.8rem;
+        line-height: 1;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+      }
+      .sync-indicator::before {
+        content: "";
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 999px;
+        background: rgba(52, 211, 153, 0.9);
+        box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.25);
+      }
+      .sync-indicator[data-state="syncing"] {
+        background: rgba(var(--brand-accent-rgb), 0.12);
+        color: var(--brand-accent);
+        border-color: rgba(var(--brand-accent-rgb), 0.45);
+      }
+      .sync-indicator[data-state="syncing"]::before {
+        background: var(--brand-accent);
+        box-shadow: 0 0 0 2px rgba(var(--brand-accent-rgb), 0.2);
+        animation: sync-pulse 1.4s infinite ease-in-out;
+      }
+      .sync-indicator[data-state="error"] {
+        background: rgba(248, 113, 113, 0.12);
+        color: #fca5a5;
+        border-color: rgba(248, 113, 113, 0.35);
+      }
+      .sync-indicator[data-state="error"]::before {
+        background: #f87171;
+        box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.25);
+      }
+      .sync-indicator[data-state="idle"]::before {
+        background: rgba(148, 163, 184, 0.75);
+        box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.2);
+      }
+      @keyframes sync-pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 0.5;
+        }
+      }
       nav ul {
         list-style: none;
         padding: 0;
@@ -437,6 +507,30 @@
       .hidden {
         display: none !important;
       }
+      .text-error {
+        color: #f87171;
+      }
+      .auth-container {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1.25rem;
+        background: rgba(2, 6, 23, 0.85);
+        backdrop-filter: blur(6px);
+        z-index: 950;
+      }
+      .auth-card {
+        width: min(100%, 420px);
+      }
+      .auth-card h2 {
+        font-size: 1.45rem;
+        margin-bottom: 0.35rem;
+      }
+      .auth-subtext {
+        margin: 0;
+      }
       @media (max-width: 600px) {
         .grid-2,
         .grid-3 {
@@ -466,7 +560,56 @@
       aria-live="assertive"
       aria-atomic="true"
     ></div>
-    <div class="app-shell" id="app">
+    <div
+      id="auth-container"
+      class="auth-container hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="login-title"
+    >
+      <form
+        id="login-form"
+        class="card auth-card"
+        autocomplete="off"
+        novalidate
+        aria-describedby="login-error"
+      >
+        <div class="grid gap-sm">
+          <div>
+            <h2 id="login-title">Sign in to Zantra Bookings</h2>
+            <p class="text-muted text-small auth-subtext">
+              Use your Zantra Supabase credentials to continue.
+            </p>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="login-email">Email</label>
+            <input
+              id="login-email"
+              name="email"
+              type="email"
+              required
+              autocomplete="email"
+              inputmode="email"
+            />
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="login-password">Password</label>
+            <input
+              id="login-password"
+              name="password"
+              type="password"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+          <p id="login-error" class="text-small text-error hidden" role="alert"></p>
+          <button id="login-submit" class="btn btn-primary" type="submit">
+            Sign in
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="app-shell hidden" id="app">
       <header class="card app-header">
         <div class="grid grid-2 gap-md items-start">
           <div class="header-brand">
@@ -484,10 +627,22 @@
             </div>
           </div>
           <div class="header-actions flex justify-end items-start flex-wrap">
+            <span
+              id="sync-status"
+              class="sync-indicator"
+              role="status"
+              aria-live="polite"
+              data-state="idle"
+            >
+              Offline
+            </span>
             <button id="quick-add-booking" class="btn btn-primary" type="button">
               Quick Add Booking
             </button>
             <button id="quick-add-payment" class="btn" type="button">Record Payment</button>
+            <button id="logout-button" class="btn btn-ghost btn-sm hidden" type="button">
+              Log out
+            </button>
           </div>
         </div>
       </header>
@@ -1112,65 +1267,318 @@
         }
         const { safeClone, DateUtils, TextUtils, Toast, Theme } = core;
 
-        const STORAGE_KEY = "zantra_bookings_v2";
         const defaultState = {
           bookings: [],
           invoices: [],
           payments: [],
           settings: {
+            id: "settings",
             name: "Zantra Studios",
             email: "team@zantra.com",
             phone: "+1 (555) 123-4567",
             color: "#a855f7",
             address: "123 Market Street, Suite 400, San Francisco, CA",
+            updatedAt: new Date().toISOString(),
+            dirty: false,
+            userId: null,
           },
         };
 
-        const AppStore = (() => {
-          let state = load();
-          Theme.setAccent(state.settings.color || defaultState.settings.color);
+        const Database = (() => {
+          const STORE_NAMES = ["bookings", "invoices", "payments", "settings"];
+          const DB_NAME = "zantra_console_v1";
+          const DB_VERSION = 1;
+          const isSupported = typeof indexedDB !== "undefined";
 
-          function load() {
-            try {
-              const raw = localStorage.getItem(STORAGE_KEY);
-              if (!raw) return safeClone(defaultState);
-              const parsed = JSON.parse(raw);
-              return {
-                bookings: Array.isArray(parsed.bookings) ? parsed.bookings : [],
-                invoices: Array.isArray(parsed.invoices) ? parsed.invoices : [],
-                payments: Array.isArray(parsed.payments) ? parsed.payments : [],
-                settings: Object.assign({}, defaultState.settings, parsed.settings || {}),
+          const memoryStores = STORE_NAMES.reduce((acc, name) => {
+            acc.set(name, new Map());
+            return acc;
+          }, new Map());
+
+          let openPromise = null;
+
+          const openDb = () => {
+            if (!isSupported) return Promise.resolve(null);
+            if (openPromise) return openPromise;
+            openPromise = new Promise((resolve, reject) => {
+              const request = indexedDB.open(DB_NAME, DB_VERSION);
+              request.onerror = () => {
+                reject(request.error || new Error("Unable to open IndexedDB."));
               };
-            } catch (error) {
-              console.error("Failed to load persisted data", error);
-              Toast.show("Could not load saved data. Using defaults.", "warning");
-              return safeClone(defaultState);
-            }
-          }
+              request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                STORE_NAMES.forEach((name) => {
+                  if (!db.objectStoreNames.contains(name)) {
+                    const store = db.createObjectStore(name, { keyPath: "id" });
+                    store.createIndex("dirty", "dirty", { unique: false });
+                    store.createIndex("updatedAt", "updatedAt", { unique: false });
+                  }
+                });
+              };
+              request.onsuccess = () => {
+                const db = request.result;
+                db.onversionchange = () => db.close();
+                resolve(db);
+              };
+            });
+            return openPromise;
+          };
 
-          function persist() {
-            try {
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-            } catch (error) {
-              console.error("Failed to persist data", error);
-              if (
-                error &&
-                (error.name === "QuotaExceededError" ||
-                  error.name === "NS_ERROR_DOM_QUOTA_REACHED" ||
-                  error.code === 22)
-              ) {
-                Toast.show("Storage limit reached. Recent changes may not be saved.", "error");
-              }
+          const getAll = async (storeName) => {
+            if (!STORE_NAMES.includes(storeName)) return [];
+            if (!isSupported) {
+              const store = memoryStores.get(storeName);
+              return Array.from(store.values()).map((item) => safeClone(item));
             }
-          }
+            const db = await openDb();
+            return new Promise((resolve, reject) => {
+              const tx = db.transaction(storeName, "readonly");
+              const store = tx.objectStore(storeName);
+              const request = store.getAll();
+              request.onsuccess = () => resolve(request.result || []);
+              request.onerror = () => reject(request.error || new Error("Failed to read data."));
+            });
+          };
+
+          const put = async (storeName, value) => {
+            if (!STORE_NAMES.includes(storeName) || !value) return;
+            if (!isSupported) {
+              const store = memoryStores.get(storeName);
+              store.set(value.id, safeClone(value));
+              return;
+            }
+            const db = await openDb();
+            return new Promise((resolve, reject) => {
+              const tx = db.transaction(storeName, "readwrite");
+              const store = tx.objectStore(storeName);
+              store.put(value);
+              tx.oncomplete = () => resolve();
+              tx.onerror = () => reject(tx.error || new Error("Failed to persist record."));
+              tx.onabort = () => reject(tx.error || new Error("Transaction aborted."));
+            });
+          };
+
+          const putMany = async (storeName, values) => {
+            if (!Array.isArray(values) || values.length === 0) return;
+            if (!STORE_NAMES.includes(storeName)) return;
+            if (!isSupported) {
+              const store = memoryStores.get(storeName);
+              values.forEach((value) => {
+                if (value?.id) store.set(value.id, safeClone(value));
+              });
+              return;
+            }
+            const db = await openDb();
+            return new Promise((resolve, reject) => {
+              const tx = db.transaction(storeName, "readwrite");
+              const store = tx.objectStore(storeName);
+              values.forEach((value) => {
+                if (value?.id) store.put(value);
+              });
+              tx.oncomplete = () => resolve();
+              tx.onerror = () => reject(tx.error || new Error("Failed to persist batch."));
+              tx.onabort = () => reject(tx.error || new Error("Transaction aborted."));
+            });
+          };
+
+          const deleteRecord = async (storeName, key) => {
+            if (!STORE_NAMES.includes(storeName)) return;
+            if (!isSupported) {
+              const store = memoryStores.get(storeName);
+              store.delete(key);
+              return;
+            }
+            const db = await openDb();
+            return new Promise((resolve, reject) => {
+              const tx = db.transaction(storeName, "readwrite");
+              const store = tx.objectStore(storeName);
+              store.delete(key);
+              tx.oncomplete = () => resolve();
+              tx.onerror = () => reject(tx.error || new Error("Failed to delete record."));
+              tx.onabort = () => reject(tx.error || new Error("Transaction aborted."));
+            });
+          };
+
+          const deleteMany = async (storeName, keys) => {
+            if (!Array.isArray(keys) || keys.length === 0) return;
+            if (!STORE_NAMES.includes(storeName)) return;
+            if (!isSupported) {
+              const store = memoryStores.get(storeName);
+              keys.forEach((key) => store.delete(key));
+              return;
+            }
+            const db = await openDb();
+            return new Promise((resolve, reject) => {
+              const tx = db.transaction(storeName, "readwrite");
+              const store = tx.objectStore(storeName);
+              keys.forEach((key) => store.delete(key));
+              tx.oncomplete = () => resolve();
+              tx.onerror = () => reject(tx.error || new Error("Failed to delete batch."));
+              tx.onabort = () => reject(tx.error || new Error("Transaction aborted."));
+            });
+          };
+
+          const getDirty = async (storeName) => {
+            if (!STORE_NAMES.includes(storeName)) return [];
+            if (!isSupported) {
+              const store = memoryStores.get(storeName);
+              return Array.from(store.values()).filter((item) => item?.dirty);
+            }
+            const db = await openDb();
+            return new Promise((resolve, reject) => {
+              const tx = db.transaction(storeName, "readonly");
+              const store = tx.objectStore(storeName);
+              let request = null;
+              if (store.indexNames.contains("dirty")) {
+                const index = store.index("dirty");
+                request = index.getAll(IDBKeyRange.only(true));
+              } else {
+                request = store.getAll();
+              }
+              request.onsuccess = () => {
+                const result = request.result || [];
+                if (!store.indexNames.contains("dirty")) {
+                  resolve(result.filter((item) => item?.dirty));
+                } else {
+                  resolve(result);
+                }
+              };
+              request.onerror = () => reject(request.error || new Error("Failed to query dirty records."));
+            });
+          };
+
+          const clearStore = async (storeName) => {
+            if (!STORE_NAMES.includes(storeName)) return;
+            if (!isSupported) {
+              memoryStores.get(storeName).clear();
+              return;
+            }
+            const db = await openDb();
+            return new Promise((resolve, reject) => {
+              const tx = db.transaction(storeName, "readwrite");
+              tx.objectStore(storeName).clear();
+              tx.oncomplete = () => resolve();
+              tx.onerror = () => reject(tx.error || new Error("Failed to clear store."));
+              tx.onabort = () => reject(tx.error || new Error("Transaction aborted."));
+            });
+          };
+
+          return Object.freeze({
+            init: openDb,
+            getAll,
+            put,
+            putMany,
+            delete: deleteRecord,
+            deleteMany,
+            getDirty,
+            clearStore,
+            isSupported: () => isSupported,
+          });
+        })();
+
+        const AppStore = (() => {
+          const prefixMap = {
+            bookings: "booking",
+            invoices: "invoice",
+            payments: "payment",
+            settings: "settings",
+          };
+
+          const memory = {
+            bookings: [],
+            invoices: [],
+            payments: [],
+            settings: safeClone(defaultState.settings),
+          };
+
+          let ready = false;
 
           const randomId = (prefix) => {
-            const id =
-              typeof crypto !== "undefined" && crypto.randomUUID
+            const unique =
+              typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
                 ? crypto.randomUUID()
                 : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-            return `${prefix}_${id}`;
+            return `${prefix}_${unique}`;
           };
+
+          const normalizeRecord = (record, storeName) => {
+            const copy = Object.assign({}, record || {});
+            const prefix = prefixMap[storeName] || "record";
+            if (!copy.id) copy.id = storeName === "settings" ? "settings" : randomId(prefix);
+            const remoteUpdatedAt = copy.updated_at || copy.updatedAt;
+            copy.updatedAt =
+              typeof remoteUpdatedAt === "string" && remoteUpdatedAt
+                ? remoteUpdatedAt
+                : new Date().toISOString();
+            copy.dirty = Boolean(copy.dirty);
+            if (copy.user_id && !copy.userId) copy.userId = copy.user_id;
+            if (!copy.userId) copy.userId = null;
+            if (storeName === "settings") {
+              copy.id = "settings";
+            }
+            delete copy.user_id;
+            delete copy.updated_at;
+            return copy;
+          };
+
+          const normalizeCollection = (storeName, records) => {
+            if (!Array.isArray(records)) return [];
+            return records.map((item) => normalizeRecord(item, storeName));
+          };
+
+          const ensureReady = () => (ready ? Promise.resolve() : readyPromise);
+
+          const getActiveUserId = () => {
+            if (typeof window === "undefined") return null;
+            const auth = window.ZantraAuth;
+            if (auth && typeof auth.getUserId === "function") {
+              return auth.getUserId();
+            }
+            return null;
+          };
+
+          const markDirty = (record) => {
+            record.updatedAt = new Date().toISOString();
+            record.dirty = true;
+            if (!record.userId) {
+              record.userId = getActiveUserId();
+            }
+          };
+
+          const cloneList = (items) => items.map((item) => safeClone(item));
+
+          const readyPromise = (async () => {
+            try {
+              await Database.init();
+              const [bookings, invoices, payments, settings] = await Promise.all([
+                Database.getAll("bookings"),
+                Database.getAll("invoices"),
+                Database.getAll("payments"),
+                Database.getAll("settings"),
+              ]);
+              memory.bookings = normalizeCollection("bookings", bookings);
+              memory.invoices = normalizeCollection("invoices", invoices);
+              memory.payments = normalizeCollection("payments", payments);
+              if (Array.isArray(settings) && settings.length > 0) {
+                memory.settings = normalizeRecord(settings[0], "settings");
+              } else {
+                memory.settings = normalizeRecord(defaultState.settings, "settings");
+                memory.settings.dirty = false;
+                await Database.put("settings", memory.settings);
+              }
+              Theme.setAccent(memory.settings.color || defaultState.settings.color);
+            } catch (error) {
+              console.error("Failed to load local data", error);
+              Toast.show("Local data unavailable. Loaded defaults.", "warning");
+              memory.bookings = [];
+              memory.invoices = [];
+              memory.payments = [];
+              memory.settings = normalizeRecord(defaultState.settings, "settings");
+              memory.settings.dirty = false;
+            } finally {
+              ready = true;
+            }
+          })();
 
           const startOfToday = () => {
             const today = new Date();
@@ -1178,51 +1586,113 @@
             return today;
           };
 
-          return {
+          const getCollectionByStore = (storeName) => {
+            switch (storeName) {
+              case "bookings":
+                return memory.bookings;
+              case "invoices":
+                return memory.invoices;
+              case "payments":
+                return memory.payments;
+              default:
+                return [];
+            }
+          };
+
+          const markClean = async (storeName, payloads) => {
+            if (!Array.isArray(payloads) || payloads.length === 0) return;
+            await ensureReady();
+            if (storeName === "settings") {
+              const latest = payloads[payloads.length - 1];
+              const normalized = normalizeRecord(latest, "settings");
+              normalized.dirty = false;
+              memory.settings = Object.assign({}, memory.settings, normalized, { dirty: false });
+              await Database.put("settings", memory.settings);
+              Theme.setAccent(memory.settings.color || defaultState.settings.color);
+              return;
+            }
+            const target = getCollectionByStore(storeName);
+            const updates = [];
+            payloads.forEach((entry) => {
+              const normalized = normalizeRecord(entry, storeName);
+              normalized.dirty = false;
+              const index = target.findIndex((item) => item.id === normalized.id);
+              if (index === -1) {
+                target.push(normalized);
+              } else {
+                target[index] = Object.assign({}, target[index], normalized, { dirty: false });
+              }
+              updates.push(normalized);
+            });
+            if (updates.length) {
+              await Database.putMany(storeName, updates);
+            }
+          };
+
+          const api = {
+            ready: () => ensureReady(),
             get settings() {
-              return safeClone(state.settings);
+              return safeClone(memory.settings);
             },
-            updateSettings(updates) {
-              state.settings = Object.assign({}, state.settings, updates);
-              persist();
-              return safeClone(state.settings);
+            async updateSettings(updates) {
+              await ensureReady();
+              const next = Object.assign({}, memory.settings, updates);
+              markDirty(next);
+              memory.settings = next;
+              await Database.put("settings", memory.settings);
+              Theme.setAccent(memory.settings.color || defaultState.settings.color);
+              return safeClone(memory.settings);
             },
-            addBooking(booking) {
-              const entry = Object.assign({ id: randomId("booking") }, booking);
-              state.bookings.push(entry);
-              persist();
+            async addBooking(booking) {
+              await ensureReady();
+              const entry = normalizeRecord(
+                Object.assign({ id: randomId("booking") }, booking),
+                "bookings"
+              );
+              markDirty(entry);
+              memory.bookings.push(entry);
+              await Database.put("bookings", entry);
               return safeClone(entry);
             },
-            updateBooking(id, updates) {
-              const index = state.bookings.findIndex((item) => item.id === id);
+            async updateBooking(id, updates) {
+              await ensureReady();
+              const index = memory.bookings.findIndex((item) => item.id === id);
               if (index === -1) return null;
-              state.bookings[index] = Object.assign({}, state.bookings[index], updates);
-              persist();
-              return safeClone(state.bookings[index]);
+              const updated = Object.assign({}, memory.bookings[index], updates);
+              markDirty(updated);
+              memory.bookings[index] = updated;
+              await Database.put("bookings", updated);
+              return safeClone(updated);
             },
-            removeBooking(id) {
-              const before = state.bookings.length;
-              state.bookings = state.bookings.filter((item) => item.id !== id);
-              if (before === state.bookings.length) return false;
-              state.invoices = state.invoices.filter((invoice) => invoice.bookingId !== id);
-              persist();
+            async removeBooking(id) {
+              await ensureReady();
+              const index = memory.bookings.findIndex((item) => item.id === id);
+              if (index === -1) return false;
+              memory.bookings.splice(index, 1);
+              await Database.delete("bookings", id);
+              const linkedInvoices = memory.invoices.filter((invoice) => invoice.bookingId === id);
+              if (linkedInvoices.length > 0) {
+                const removalIds = linkedInvoices.map((invoice) => invoice.id);
+                memory.invoices = memory.invoices.filter((invoice) => invoice.bookingId !== id);
+                await Database.deleteMany("invoices", removalIds);
+              }
               return true;
             },
             getBookingsByDate(iso) {
-              return state.bookings
+              return memory.bookings
                 .filter((item) => item.date === iso)
                 .map((item) => safeClone(item));
             },
             getAllBookings() {
-              return safeClone(state.bookings);
+              return cloneList(memory.bookings);
             },
             getBookingById(id) {
-              const found = state.bookings.find((item) => item.id === id);
+              const found = memory.bookings.find((item) => item.id === id);
               return found ? safeClone(found) : null;
             },
             getUpcomingBookings() {
               const today = startOfToday();
-              return state.bookings
+              return memory.bookings
                 .filter((item) => {
                   const parsed = DateUtils.fromIso(item.date);
                   if (!parsed) return false;
@@ -1245,77 +1715,154 @@
                 .slice(0, 5)
                 .map((item) => safeClone(item));
             },
-            addInvoice(invoice) {
-              const entry = Object.assign({ id: randomId("invoice") }, invoice);
-              state.invoices.push(entry);
-              persist();
+            async addInvoice(invoice) {
+              await ensureReady();
+              const entry = normalizeRecord(
+                Object.assign({ id: randomId("invoice") }, invoice),
+                "invoices"
+              );
+              markDirty(entry);
+              memory.invoices.push(entry);
+              await Database.put("invoices", entry);
               return safeClone(entry);
             },
-            updateInvoice(id, updates) {
-              const index = state.invoices.findIndex((item) => item.id === id);
+            async updateInvoice(id, updates) {
+              await ensureReady();
+              const index = memory.invoices.findIndex((item) => item.id === id);
               if (index === -1) return null;
-              state.invoices[index] = Object.assign({}, state.invoices[index], updates);
-              persist();
-              return safeClone(state.invoices[index]);
+              const updated = Object.assign({}, memory.invoices[index], updates);
+              markDirty(updated);
+              memory.invoices[index] = updated;
+              await Database.put("invoices", updated);
+              return safeClone(updated);
             },
-            updateInvoiceStatus(id, status) {
+            async updateInvoiceStatus(id, status) {
               return this.updateInvoice(id, { status });
             },
-            removeInvoice(id) {
-              const before = state.invoices.length;
-              state.invoices = state.invoices.filter((item) => item.id !== id);
-              if (before === state.invoices.length) return false;
-              persist();
+            async removeInvoice(id) {
+              await ensureReady();
+              const before = memory.invoices.length;
+              memory.invoices = memory.invoices.filter((item) => item.id !== id);
+              if (before === memory.invoices.length) return false;
+              await Database.delete("invoices", id);
               return true;
             },
             getInvoices() {
-              return safeClone(state.invoices);
+              return cloneList(memory.invoices);
             },
             getInvoiceById(id) {
-              const found = state.invoices.find((item) => item.id === id);
+              const found = memory.invoices.find((item) => item.id === id);
               return found ? safeClone(found) : null;
             },
             getOpenInvoices() {
-              return state.invoices
+              return memory.invoices
                 .filter((invoice) => invoice.status !== "paid")
                 .map((invoice) => safeClone(invoice));
             },
-            addPayment(payment) {
-              const entry = Object.assign({ id: randomId("payment") }, payment);
-              state.payments.push(entry);
-              persist();
+            async addPayment(payment) {
+              await ensureReady();
+              const entry = normalizeRecord(
+                Object.assign({ id: randomId("payment") }, payment),
+                "payments"
+              );
+              markDirty(entry);
+              memory.payments.push(entry);
+              await Database.put("payments", entry);
               return safeClone(entry);
             },
-            updatePayment(id, updates) {
-              const index = state.payments.findIndex((item) => item.id === id);
+            async updatePayment(id, updates) {
+              await ensureReady();
+              const index = memory.payments.findIndex((item) => item.id === id);
               if (index === -1) return null;
-              state.payments[index] = Object.assign({}, state.payments[index], updates);
-              persist();
-              return safeClone(state.payments[index]);
+              const updated = Object.assign({}, memory.payments[index], updates);
+              markDirty(updated);
+              memory.payments[index] = updated;
+              await Database.put("payments", updated);
+              return safeClone(updated);
             },
-            removePayment(id) {
-              const before = state.payments.length;
-              state.payments = state.payments.filter((item) => item.id !== id);
-              if (before === state.payments.length) return false;
-              persist();
+            async removePayment(id) {
+              await ensureReady();
+              const before = memory.payments.length;
+              memory.payments = memory.payments.filter((item) => item.id !== id);
+              if (before === memory.payments.length) return false;
+              await Database.delete("payments", id);
               return true;
             },
             getPayments() {
-              return safeClone(state.payments);
+              return cloneList(memory.payments);
             },
             getPaymentById(id) {
-              const found = state.payments.find((item) => item.id === id);
+              const found = memory.payments.find((item) => item.id === id);
               return found ? safeClone(found) : null;
             },
             getPaymentsForMonth(year, monthIndex) {
-              return state.payments
+              return memory.payments
                 .filter((payment) => {
                   const parsed = DateUtils.fromIso(payment.date);
                   return parsed && parsed.getFullYear() === year && parsed.getMonth() === monthIndex;
                 })
                 .map((item) => safeClone(item));
             },
+            async getDirtyRecords() {
+              await ensureReady();
+              const [bookings, invoices, payments, settings] = await Promise.all([
+                Database.getDirty("bookings"),
+                Database.getDirty("invoices"),
+                Database.getDirty("payments"),
+                Database.getDirty("settings"),
+              ]);
+              return {
+                bookings: normalizeCollection("bookings", bookings),
+                invoices: normalizeCollection("invoices", invoices),
+                payments: normalizeCollection("payments", payments),
+                settings: normalizeCollection("settings", settings),
+              };
+            },
+            async markRecordsClean(storeName, payloads) {
+              await markClean(storeName, payloads);
+            },
+            async mergeRemoteRecords(storeName, payloads) {
+              if (!Array.isArray(payloads) || payloads.length === 0) return;
+              await ensureReady();
+              if (storeName === "settings") {
+                const remote = normalizeRecord(payloads[payloads.length - 1], "settings");
+                const currentTime = Date.parse(memory.settings.updatedAt || 0) || 0;
+                const remoteTime = Date.parse(remote.updatedAt || 0) || 0;
+                if (remoteTime >= currentTime) {
+                  remote.dirty = false;
+                  memory.settings = Object.assign({}, memory.settings, remote, { dirty: false });
+                  await Database.put("settings", memory.settings);
+                  Theme.setAccent(memory.settings.color || defaultState.settings.color);
+                }
+                return;
+              }
+              const target = getCollectionByStore(storeName);
+              const updates = [];
+              payloads.forEach((payload) => {
+                const normalized = normalizeRecord(payload, storeName);
+                normalized.dirty = false;
+                const index = target.findIndex((item) => item.id === normalized.id);
+                if (index === -1) {
+                  target.push(normalized);
+                  updates.push(normalized);
+                  return;
+                }
+                const existing = target[index];
+                const existingTime = Date.parse(existing.updatedAt || 0) || 0;
+                const remoteTime = Date.parse(normalized.updatedAt || 0) || 0;
+                if (remoteTime >= existingTime) {
+                  const merged = Object.assign({}, existing, normalized, { dirty: false });
+                  target[index] = merged;
+                  updates.push(merged);
+                }
+              });
+              if (updates.length) {
+                await Database.putMany(storeName, updates);
+              }
+            },
           };
+
+          return Object.freeze(api);
         })();
 
         const Tabs = (() => {
@@ -1356,6 +1903,13 @@
           let activeDate = new Date();
           let selectedIso = null;
           let editingId = null;
+
+          const requestSync = (reason) => {
+            const sync = window.ZantraSync;
+            if (sync && typeof sync.trigger === "function") {
+              sync.trigger(reason).catch(() => {});
+            }
+          };
 
           const setDefaultBookingTimes = (force = false) => {
             if (!selectedIso || editingId) return;
@@ -1492,8 +2046,9 @@
               deleteBtn.type = "button";
               deleteBtn.className = "btn btn-ghost btn-sm";
               deleteBtn.textContent = "Delete";
-              deleteBtn.addEventListener("click", () => {
-                if (!AppStore.removeBooking(booking.id)) return;
+              deleteBtn.addEventListener("click", async () => {
+                const removed = await AppStore.removeBooking(booking.id);
+                if (!removed) return;
                 if (editingId === booking.id) {
                   resetFormState();
                 }
@@ -1503,6 +2058,7 @@
                 Payments.refreshAll();
                 Reports.render();
                 Toast.show("Booking removed.", "success");
+                requestSync("booking-delete");
               });
 
               actions.append(editBtn, deleteBtn);
@@ -1526,7 +2082,7 @@
             setDefaultBookingTimes();
           };
 
-          form.addEventListener("submit", (event) => {
+          form.addEventListener("submit", async (event) => {
             event.preventDefault();
             if (!selectedIso) {
               Toast.show("Select a date on the calendar before adding a booking.", "error");
@@ -1546,33 +2102,39 @@
               Toast.show("End time must be after start time.", "error");
               return;
             }
-            if (editingId) {
-              AppStore.updateBooking(editingId, {
-                client,
-                service,
-                startTime,
-                endTime,
-                status,
-                date: selectedIso,
-              });
-              Toast.show(`Booking updated for ${DateUtils.display(selectedIso)}.`, "success");
-            } else {
-              AppStore.addBooking({
-                date: selectedIso,
-                client,
-                service,
-                startTime,
-                endTime,
-                status,
-              });
-              Toast.show(`Booking added for ${DateUtils.display(selectedIso)}.`, "success");
+            try {
+              if (editingId) {
+                await AppStore.updateBooking(editingId, {
+                  client,
+                  service,
+                  startTime,
+                  endTime,
+                  status,
+                  date: selectedIso,
+                });
+                Toast.show(`Booking updated for ${DateUtils.display(selectedIso)}.`, "success");
+              } else {
+                await AppStore.addBooking({
+                  date: selectedIso,
+                  client,
+                  service,
+                  startTime,
+                  endTime,
+                  status,
+                });
+                Toast.show(`Booking added for ${DateUtils.display(selectedIso)}.`, "success");
+              }
+              resetFormState();
+              renderCalendar();
+              renderBookings();
+              Dashboard.refresh();
+              Payments.refreshAll();
+              Reports.render();
+              requestSync("booking-change");
+            } catch (error) {
+              console.error("Failed to persist booking", error);
+              Toast.show("Unable to save booking. Please try again.", "error");
             }
-            resetFormState();
-            renderCalendar();
-            renderBookings();
-            Dashboard.refresh();
-            Payments.refreshAll();
-            Reports.render();
           });
 
           cancelEditBtn.addEventListener("click", () => {
@@ -1607,6 +2169,10 @@
             },
             selectDate,
             resetFormState,
+            refresh() {
+              renderCalendar();
+              renderBookings();
+            },
           };
         })();
 
@@ -1626,6 +2192,13 @@
 
           let editingInvoiceId = null;
           let editingPaymentId = null;
+
+          const requestSync = (reason) => {
+            const sync = window.ZantraSync;
+            if (sync && typeof sync.trigger === "function") {
+              sync.trigger(reason).catch(() => {});
+            }
+          };
 
           const refreshInvoiceOptions = () => {
             const bookings = AppStore.getAllBookings();
@@ -1708,11 +2281,20 @@
                 if (invoice.status === optionValue) option.selected = true;
                 statusSelect.appendChild(option);
               });
-              statusSelect.addEventListener("change", (event) => {
-                AppStore.updateInvoiceStatus(event.target.dataset.id, event.target.value);
-                Dashboard.refresh();
-                Reports.render();
-                Toast.show("Invoice status updated.", "success", { duration: 2500 });
+              statusSelect.addEventListener("change", async (event) => {
+                const target = event.target;
+                const previous = invoice.status;
+                try {
+                  await AppStore.updateInvoiceStatus(target.dataset.id, target.value);
+                  Dashboard.refresh();
+                  Reports.render();
+                  Toast.show("Invoice status updated.", "success", { duration: 2500 });
+                  requestSync("invoice-status");
+                } catch (error) {
+                  console.error("Failed to update invoice status", error);
+                  Toast.show("Unable to update invoice status.", "error");
+                  target.value = previous || "draft";
+                }
               });
               statusCell.appendChild(statusSelect);
 
@@ -1741,8 +2323,9 @@
               deleteBtn.type = "button";
               deleteBtn.className = "btn btn-ghost btn-sm";
               deleteBtn.textContent = "Delete";
-              deleteBtn.addEventListener("click", () => {
-                if (!AppStore.removeInvoice(invoice.id)) return;
+              deleteBtn.addEventListener("click", async () => {
+                const removed = await AppStore.removeInvoice(invoice.id);
+                if (!removed) return;
                 if (editingInvoiceId === invoice.id) {
                   resetInvoiceForm();
                 }
@@ -1750,6 +2333,7 @@
                 Dashboard.refresh();
                 Reports.render();
                 Toast.show("Invoice removed.", "success");
+                requestSync("invoice-delete");
               });
 
               actionsCell.append(editBtn, deleteBtn);
@@ -1808,8 +2392,9 @@
               deleteBtn.type = "button";
               deleteBtn.className = "btn btn-ghost btn-sm";
               deleteBtn.textContent = "Delete";
-              deleteBtn.addEventListener("click", () => {
-                if (!AppStore.removePayment(payment.id)) return;
+              deleteBtn.addEventListener("click", async () => {
+                const removed = await AppStore.removePayment(payment.id);
+                if (!removed) return;
                 if (editingPaymentId === payment.id) {
                   resetPaymentForm();
                 }
@@ -1817,6 +2402,7 @@
                 Dashboard.refresh();
                 Reports.render();
                 Toast.show("Payment removed.", "success");
+                requestSync("payment-delete");
               });
 
               actionsCell.append(editBtn, deleteBtn);
@@ -1826,7 +2412,7 @@
             });
           };
 
-          invoiceForm.addEventListener("submit", (event) => {
+          invoiceForm.addEventListener("submit", async (event) => {
             event.preventDefault();
             if (invoiceSelect.disabled || !invoiceSelect.value) {
               Toast.show("Select a booking before creating an invoice.", "error");
@@ -1859,24 +2445,30 @@
                   ? AppStore.getInvoiceById(editingInvoiceId).status || "draft"
                   : "draft",
             };
-            if (editingInvoiceId) {
-              AppStore.updateInvoice(editingInvoiceId, payload);
-              Toast.show("Invoice updated.", "success");
-            } else {
-              AppStore.addInvoice(payload);
-              Toast.show("Invoice created.", "success");
+            try {
+              if (editingInvoiceId) {
+                await AppStore.updateInvoice(editingInvoiceId, payload);
+                Toast.show("Invoice updated.", "success");
+              } else {
+                await AppStore.addInvoice(payload);
+                Toast.show("Invoice created.", "success");
+              }
+              resetInvoiceForm();
+              renderInvoices();
+              Dashboard.refresh();
+              Reports.render();
+              requestSync("invoice-change");
+            } catch (error) {
+              console.error("Failed to save invoice", error);
+              Toast.show("Unable to save invoice. Please try again.", "error");
             }
-            resetInvoiceForm();
-            renderInvoices();
-            Dashboard.refresh();
-            Reports.render();
           });
 
           invoiceCancelEdit.addEventListener("click", () => {
             resetInvoiceForm();
           });
 
-          paymentForm.addEventListener("submit", (event) => {
+          paymentForm.addEventListener("submit", async (event) => {
             event.preventDefault();
             const data = new FormData(paymentForm);
             const client = String(data.get("client") || "").trim();
@@ -1901,17 +2493,23 @@
               method: String(data.get("method") || "Card"),
               reference: String(data.get("reference") || "").trim(),
             };
-            if (editingPaymentId) {
-              AppStore.updatePayment(editingPaymentId, payload);
-              Toast.show("Payment updated.", "success");
-            } else {
-              AppStore.addPayment(payload);
-              Toast.show("Payment recorded.", "success");
+            try {
+              if (editingPaymentId) {
+                await AppStore.updatePayment(editingPaymentId, payload);
+                Toast.show("Payment updated.", "success");
+              } else {
+                await AppStore.addPayment(payload);
+                Toast.show("Payment recorded.", "success");
+              }
+              resetPaymentForm();
+              renderPayments();
+              Dashboard.refresh();
+              Reports.render();
+              requestSync("payment-change");
+            } catch (error) {
+              console.error("Failed to save payment", error);
+              Toast.show("Unable to save payment. Please try again.", "error");
             }
-            resetPaymentForm();
-            renderPayments();
-            Dashboard.refresh();
-            Reports.render();
           });
 
           paymentCancelEdit.addEventListener("click", () => {
@@ -2247,6 +2845,13 @@
           };
           const brandingTitle = document.getElementById("branding-title");
 
+          const requestSync = (reason) => {
+            const sync = window.ZantraSync;
+            if (sync && typeof sync.trigger === "function") {
+              sync.trigger(reason).catch(() => {});
+            }
+          };
+
           const applyPreview = (settings) => {
             brandingTitle.textContent = `${settings.name} Console`;
             preview.name.textContent = settings.name;
@@ -2256,7 +2861,7 @@
             Theme.setAccent(settings.color || defaultState.settings.color);
           };
 
-          form.addEventListener("submit", (event) => {
+          form.addEventListener("submit", async (event) => {
             event.preventDefault();
             const data = new FormData(form);
             const updates = {
@@ -2270,10 +2875,16 @@
               Toast.show("Name and email are required for branding.", "error");
               return;
             }
-            const updated = AppStore.updateSettings(updates);
-            applyPreview(updated);
-            Reports.render();
-            Toast.show("Brand settings saved.", "success");
+            try {
+              const updated = await AppStore.updateSettings(updates);
+              applyPreview(updated);
+              Reports.render();
+              Toast.show("Brand settings saved.", "success");
+              requestSync("settings-change");
+            } catch (error) {
+              console.error("Failed to update settings", error);
+              Toast.show("Unable to save settings. Please try again.", "error");
+            }
           });
 
           return {
@@ -2352,13 +2963,452 @@
           };
         })();
 
+        const Sync = (() => {
+          const statusNode = document.getElementById("sync-status");
+          const SYNC_INTERVAL_MS = 2 * 60 * 1000;
+          const LAST_SYNC_STORAGE_KEY = "zantra_bookings_last_sync";
+          let intervalId = null;
+          let isSyncing = false;
+          let lastSyncIso = null;
+
+          const getClient = () => globalThis.supabaseClient || null;
+          const isOnline = () => navigator.onLine !== false;
+          const getAuthApi = () => (typeof window !== "undefined" ? window.ZantraAuth : null);
+          const getUserId = () => {
+            const auth = getAuthApi();
+            return auth && typeof auth.getUserId === "function" ? auth.getUserId() : null;
+          };
+          const isAuthenticated = () => {
+            const auth = getAuthApi();
+            return auth && typeof auth.isAuthenticated === "function" ? auth.isAuthenticated() : false;
+          };
+          const canSync = () => Boolean(getClient()) && isAuthenticated() && isOnline();
+
+          const loadLastSync = () => {
+            if (lastSyncIso) return lastSyncIso;
+            try {
+              const stored = localStorage.getItem(LAST_SYNC_STORAGE_KEY);
+              if (stored) {
+                lastSyncIso = stored;
+              }
+            } catch (error) {
+              console.warn("Failed to load last sync time", error);
+            }
+            return lastSyncIso;
+          };
+
+          const saveLastSync = (iso) => {
+            lastSyncIso = iso;
+            try {
+              if (iso) {
+                localStorage.setItem(LAST_SYNC_STORAGE_KEY, iso);
+              } else {
+                localStorage.removeItem(LAST_SYNC_STORAGE_KEY);
+              }
+            } catch (error) {
+              console.warn("Failed to persist last sync time", error);
+            }
+          };
+
+          const clearLastSync = () => {
+            saveLastSync(null);
+          };
+
+          const formatTimestamp = (iso) => {
+            if (!iso) return "Awaiting sync";
+            const date = new Date(iso);
+            if (Number.isNaN(date.getTime())) return "Awaiting sync";
+            return `Synced ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+          };
+
+          const updateStatus = (state, message) => {
+            if (!statusNode) return;
+            statusNode.dataset.state = state;
+            statusNode.textContent = message;
+          };
+
+          const convertForRemote = (table, record, userId) => {
+            const { dirty, userId: localUserId, updatedAt, ...rest } = record;
+            return Object.assign({}, rest, {
+              updated_at: updatedAt || new Date().toISOString(),
+              user_id: localUserId || userId,
+            });
+          };
+
+          const pushLocalChanges = async () => {
+            const userId = getUserId();
+            if (!userId) return;
+            const dirty = await AppStore.getDirtyRecords();
+            const tables = ["bookings", "invoices", "payments", "settings"];
+            for (const table of tables) {
+              const records = dirty[table];
+              if (!Array.isArray(records) || records.length === 0) continue;
+              const payload = records.map((record) => convertForRemote(table, record, userId));
+              const client = getClient();
+              if (!client) return;
+              const { data, error } = await client
+                .from(table)
+                .upsert(payload, { onConflict: "id" })
+                .select();
+              if (error) throw error;
+              const response = Array.isArray(data) && data.length ? data : payload;
+              await AppStore.markRecordsClean(
+                table,
+                response.map((item) => ({
+                  ...item,
+                  updated_at: item.updated_at || item.updatedAt || new Date().toISOString(),
+                  user_id: item.user_id || userId,
+                }))
+              );
+            }
+          };
+
+          const pullRemoteChanges = async () => {
+            const client = getClient();
+            const userId = getUserId();
+            if (!client || !userId) return null;
+            const since = loadLastSync();
+            let newest = since ? Date.parse(since) : 0;
+            const tables = ["bookings", "invoices", "payments", "settings"];
+            for (const table of tables) {
+              let query = client.from(table).select("*").eq("user_id", userId);
+              if (since) {
+                query = query.gt("updated_at", since);
+              }
+              const { data, error } = await query.order("updated_at", { ascending: true });
+              if (error) throw error;
+              if (Array.isArray(data) && data.length) {
+                await AppStore.mergeRemoteRecords(table, data);
+                const latest = data[data.length - 1].updated_at;
+                if (latest) {
+                  const parsed = Date.parse(latest);
+                  if (!Number.isNaN(parsed)) {
+                    newest = Math.max(newest, parsed);
+                  }
+                }
+              }
+            }
+            return newest ? new Date(newest).toISOString() : since;
+          };
+
+          const synchronize = async (reason = "manual") => {
+            if (!canSync()) {
+              const message = !isOnline()
+                ? "Offline"
+                : isAuthenticated()
+                ? "Awaiting sync"
+                : "Sign in to sync";
+              updateStatus("idle", message);
+              return;
+            }
+            if (isSyncing) return;
+            isSyncing = true;
+            updateStatus("syncing", "Syncing…");
+            try {
+              await AppStore.ready();
+              await pushLocalChanges();
+              const remoteIso = await pullRemoteChanges();
+              const finalIso = remoteIso || new Date().toISOString();
+              saveLastSync(finalIso);
+              updateStatus("synced", formatTimestamp(finalIso));
+              if (typeof Calendar?.refresh === "function") {
+                Calendar.refresh();
+              }
+              if (typeof Payments?.refreshAll === "function") {
+                Payments.refreshAll();
+              }
+              if (typeof Dashboard?.refresh === "function") {
+                Dashboard.refresh();
+              }
+              if (typeof Reports?.render === "function") {
+                Reports.render();
+              }
+            } catch (error) {
+              console.error("Sync failed", error);
+              updateStatus("error", "Sync failed");
+              Toast.show("Sync failed. We'll retry shortly.", "warning");
+              throw error;
+            } finally {
+              isSyncing = false;
+            }
+          };
+
+          const startInterval = () => {
+            if (intervalId) window.clearInterval(intervalId);
+            intervalId = window.setInterval(() => {
+              synchronize("interval").catch(() => {});
+            }, SYNC_INTERVAL_MS);
+          };
+
+          window.addEventListener("online", () => {
+            if (canSync()) {
+              synchronize("online").catch(() => {});
+            } else if (statusNode) {
+              updateStatus("idle", "Offline");
+            }
+          });
+
+          const init = () => {
+            const saved = loadLastSync();
+            if (statusNode) {
+              const state = isOnline() ? "idle" : "idle";
+              const message = isOnline() ? formatTimestamp(saved) : "Offline";
+              updateStatus(state, message);
+            }
+          };
+
+          return Object.freeze({
+            init,
+            trigger: (reason) => synchronize(reason),
+            handleLogin() {
+              loadLastSync();
+              startInterval();
+              synchronize("login").catch(() => {});
+            },
+            handleLogout() {
+              if (intervalId) {
+                window.clearInterval(intervalId);
+                intervalId = null;
+              }
+              clearLastSync();
+              if (statusNode) {
+                updateStatus("idle", "Signed out");
+              }
+            },
+          });
+        })();
+
+        window.ZantraSync = Sync;
+
+        const Auth = (() => {
+          const client = globalThis.supabaseClient || null;
+          const appShell = document.getElementById("app");
+          const authScreen = document.getElementById("auth-container");
+          const loginForm = document.getElementById("login-form");
+          const emailInput = document.getElementById("login-email");
+          const passwordInput = document.getElementById("login-password");
+          const submitButton = document.getElementById("login-submit");
+          const errorNode = document.getElementById("login-error");
+          const logoutButton = document.getElementById("logout-button");
+
+          let activeUserId = null;
+          let bootstrapped = false;
+          let pendingLoginToast = false;
+          window.ZantraAuthUserId = null;
+
+          const setError = (message) => {
+            if (!errorNode) return;
+            if (message) {
+              errorNode.textContent = message;
+              errorNode.classList.remove("hidden");
+            } else {
+              errorNode.textContent = "";
+              errorNode.classList.add("hidden");
+            }
+          };
+
+          const setLoading = (isLoading) => {
+            if (submitButton) {
+              submitButton.disabled = isLoading;
+              submitButton.textContent = isLoading ? "Signing in..." : "Sign in";
+            }
+            if (emailInput) emailInput.disabled = isLoading;
+            if (passwordInput) passwordInput.disabled = isLoading;
+          };
+
+          const focusEmail = () => {
+            if (!emailInput) return;
+            requestAnimationFrame(() => {
+              emailInput.focus();
+            });
+          };
+
+          const showScreen = () => {
+            if (authScreen) authScreen.classList.remove("hidden");
+            if (appShell) appShell.classList.add("hidden");
+            if (logoutButton) logoutButton.classList.add("hidden");
+            setLoading(false);
+            if (passwordInput) passwordInput.value = "";
+            focusEmail();
+          };
+
+          const hideScreen = () => {
+            if (authScreen) authScreen.classList.add("hidden");
+            if (appShell) appShell.classList.remove("hidden");
+            if (logoutButton) logoutButton.classList.remove("hidden");
+            if (loginForm) loginForm.reset();
+            setError("");
+            setLoading(false);
+          };
+
+          const bootstrapApp = async () => {
+            await AppStore.ready();
+            if (!bootstrapped) {
+              Tabs.show("dashboard");
+              Calendar.init();
+              Payments.init();
+              Settings.init();
+              Dashboard.refresh();
+              Reports.render();
+              bootstrapped = true;
+              return;
+            }
+            Tabs.show("dashboard");
+            if (typeof Calendar.resetFormState === "function") {
+              Calendar.resetFormState();
+            }
+            if (typeof Payments.refreshAll === "function") {
+              Payments.refreshAll();
+            }
+            Dashboard.refresh();
+            Reports.render();
+          };
+
+          const handleSessionChange = async (session, eventType = "STATE_CHANGE") => {
+            const wasAuthenticated = Boolean(activeUserId);
+            if (session && session.user) {
+              activeUserId = session.user.id;
+              window.ZantraAuthUserId = activeUserId;
+              hideScreen();
+              await bootstrapApp();
+              if (typeof Sync?.handleLogin === "function") {
+                Sync.handleLogin();
+              }
+              if (pendingLoginToast || (!wasAuthenticated && eventType === "INITIAL_SESSION")) {
+                Toast.show("Signed in successfully.", "success");
+              }
+              pendingLoginToast = false;
+            } else {
+              activeUserId = null;
+              window.ZantraAuthUserId = null;
+              setError("");
+              showScreen();
+              if (wasAuthenticated || eventType === "SIGNED_OUT") {
+                Toast.show("Signed out.", "info");
+              }
+              if (typeof Sync?.handleLogout === "function") {
+                Sync.handleLogout();
+              }
+              pendingLoginToast = false;
+            }
+          };
+
+          const bindEvents = () => {
+            if (loginForm) {
+              loginForm.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                if (!client) {
+                  setError("Authentication is unavailable. Please try again later.");
+                  return;
+                }
+                const formData = new FormData(loginForm);
+                const email = String(formData.get("email") || "").trim();
+                const password = String(formData.get("password") || "");
+                if (!email || !password) {
+                  setError("Email and password are required.");
+                  return;
+                }
+                setError("");
+                setLoading(true);
+                pendingLoginToast = true;
+                try {
+                  const { data, error } = await client.auth.signInWithPassword({ email, password });
+                  if (error || !data?.session) {
+                    pendingLoginToast = false;
+                    setError(error?.message || "Unable to sign in. Please check your credentials.");
+                    return;
+                  }
+                  await handleSessionChange(data.session, "MANUAL_SIGN_IN");
+                } catch (error) {
+                  pendingLoginToast = false;
+                  console.error("Failed to sign in", error);
+                  setError("Unable to sign in. Please try again.");
+                } finally {
+                  setLoading(false);
+                }
+              });
+            }
+
+            if (logoutButton) {
+              logoutButton.addEventListener("click", async () => {
+                if (!client) return;
+                logoutButton.disabled = true;
+                try {
+                  const { error } = await client.auth.signOut();
+                  if (error) {
+                    Toast.show("Could not sign out. Please try again.", "error");
+                  }
+                } catch (error) {
+                  console.error("Failed to sign out", error);
+                  Toast.show("Could not sign out. Please try again.", "error");
+                } finally {
+                  logoutButton.disabled = false;
+                }
+              });
+            }
+          };
+
+          const init = async () => {
+            if (!appShell) {
+              console.error("Application shell is missing; cannot initialize auth.");
+              return;
+            }
+
+            if (!client) {
+              if (authScreen) authScreen.classList.add("hidden");
+              appShell.classList.remove("hidden");
+              if (logoutButton) logoutButton.classList.add("hidden");
+              await bootstrapApp();
+              Toast.show("Authentication client unavailable. Loaded offline mode.", "warning");
+              return;
+            }
+
+            bindEvents();
+
+            try {
+              const { data, error } = await client.auth.getSession();
+              if (error) {
+                console.error("Failed to fetch session", error);
+                setError("Unable to verify session. Please sign in.");
+                showScreen();
+              } else if (data?.session?.user) {
+                await handleSessionChange(data.session, "INITIAL_SESSION");
+              } else {
+                showScreen();
+              }
+            } catch (error) {
+              console.error("Session lookup failed", error);
+              setError("Unable to verify session. Please sign in.");
+              showScreen();
+            }
+
+            const { data: listener } = client.auth.onAuthStateChange(async (event, session) => {
+              await handleSessionChange(session, event);
+            });
+
+            if (listener && typeof listener.subscription?.unsubscribe === "function") {
+              window.addEventListener("beforeunload", () => {
+                listener.subscription.unsubscribe();
+              });
+            }
+          };
+
+          const api = {
+            init,
+            getUserId: () => activeUserId,
+            isAuthenticated: () => Boolean(activeUserId),
+          };
+
+          window.ZantraAuth = api;
+
+          return api;
+        })();
+
         document.addEventListener("DOMContentLoaded", () => {
-          Tabs.show("dashboard");
-          Calendar.init();
-          Payments.init();
-          Settings.init();
-          Dashboard.refresh();
-          Reports.render();
+          if (typeof Sync?.init === "function") {
+            Sync.init();
+          }
+          Auth.init();
         });
       })();
     </script>
