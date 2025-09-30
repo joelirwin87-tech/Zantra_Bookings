@@ -30,6 +30,8 @@
       };
     </script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
     <style>
       :root {
         color-scheme: dark;
@@ -842,15 +844,16 @@
           <div class="grid grid-2 gap-md">
             <div class="card">
               <h2>Revenue trend</h2>
-              <canvas
-                id="revenue-chart"
-                class="mt-2"
-                width="640"
-                height="320"
-                role="img"
-                aria-label="Revenue trend chart"
-                aria-describedby="revenue-chart-summary report-highlights"
-              ></canvas>
+              <div class="mt-2 relative h-72 w-full">
+                <canvas
+                  id="revenue-chart"
+                  class="absolute inset-0 h-full w-full"
+                  role="img"
+                  aria-label="Monthly revenue trend chart"
+                  aria-describedby="revenue-chart-summary report-highlights"
+                ></canvas>
+              </div>
+
               <p id="revenue-chart-summary" class="visually-hidden">
                 Revenue trend chart with no data yet.
               </p>
@@ -2017,16 +2020,57 @@
         })();
 
         const Reports = (() => {
-          const canvas = document.getElementById("revenue-chart");
+          const chartCanvas = document.getElementById("revenue-chart");
+
           const emptyState = document.getElementById("revenue-chart-empty");
           const highlightsList = document.getElementById("report-highlights");
           const highlightsEmpty = document.getElementById("report-empty");
           const summaryNode = document.getElementById("revenue-chart-summary");
+          const ChartLib = globalThis.Chart;
+
+          if (!chartCanvas) {
+            throw new Error("Revenue chart canvas element is missing.");
+          }
+          if (!ChartLib) {
+            Toast.show("Unable to load reporting charts. Please check your connection.", "error");
+            return {
+              render() {
+                emptyState.classList.remove("hidden");
+                chartCanvas.setAttribute("aria-hidden", "true");
+                if (summaryNode) {
+                  summaryNode.textContent = "Revenue charts are unavailable because Chart.js failed to load.";
+                }
+              },
+            };
+          }
+
+          let chartInstance = null;
+
 
           const getAccentColor = () => {
             const accent = getComputedStyle(document.documentElement).getPropertyValue("--brand-accent");
             return accent ? accent.trim() : defaultState.settings.color;
           };
+
+          const hexToRgba = (hex, alpha = 1) => {
+            const fallback = `rgba(168, 85, 247, ${alpha})`;
+            if (!hex) return fallback;
+            let value = hex.trim().replace(/^#/, "");
+            if (value.length === 3) {
+              value = value
+                .split("")
+                .map((char) => char + char)
+                .join("");
+            }
+            if (value.length !== 6) return fallback;
+            const numeric = Number.parseInt(value, 16);
+            if (Number.isNaN(numeric)) return fallback;
+            const r = (numeric >> 16) & 255;
+            const g = (numeric >> 8) & 255;
+            const b = numeric & 255;
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+          };
+
 
           const updateSummary = (dataset) => {
             if (!summaryNode) return;
@@ -2038,53 +2082,115 @@
             const first = dataset[0];
             const last = dataset[dataset.length - 1];
             const average = total / dataset.length;
-            summaryNode.textContent = `Revenue trend from ${first.label} to ${last.label}. Total $${total.toFixed(
+            summaryNode.textContent = `Monthly revenue trend from ${first.label} to ${last.label}. Total $${total.toFixed(
               2
-            )} across ${dataset.length} month${dataset.length === 1 ? "" : "s"} with an average of $${average.toFixed(2)} per month.`;
+            )} across ${dataset.length} month${dataset.length === 1 ? "" : "s"} with an average of $${average.toFixed(
+              2
+            )} per month.`;
           };
 
           const renderChart = (dataset) => {
-            const ctx = canvas.getContext("2d");
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             if (dataset.length === 0) {
               emptyState.classList.remove("hidden");
-              updateSummary([]);
+              chartCanvas.setAttribute("aria-hidden", "true");
+              if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
+              }
               return;
             }
+
             emptyState.classList.add("hidden");
-            const padding = 40;
-            const width = canvas.width - padding * 2;
-            const height = canvas.height - padding * 2;
-            const max = Math.max(...dataset.map((item) => item.total), 1);
-            ctx.strokeStyle = "rgba(148,163,184,0.35)";
-            ctx.beginPath();
-            ctx.moveTo(padding, padding);
-            ctx.lineTo(padding, padding + height);
-            ctx.lineTo(padding + width, padding + height);
-            ctx.stroke();
+            chartCanvas.setAttribute("aria-hidden", "false");
+
+            const labels = dataset.map((item) => item.label);
+            const values = dataset.map((item) => Number(item.total || 0));
             const accent = getAccentColor();
-            ctx.strokeStyle = accent || "#a855f7";
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            dataset.forEach((item, index) => {
-              const x = padding + (index / Math.max(dataset.length - 1, 1)) * width;
-              const y = padding + height - (item.total / max) * height;
-              if (index === 0) ctx.moveTo(x, y);
-              else ctx.lineTo(x, y);
-            });
-            ctx.stroke();
-            ctx.fillStyle = accent || "#a855f7";
-            dataset.forEach((item, index) => {
-              const x = padding + (index / Math.max(dataset.length - 1, 1)) * width;
-              const y = padding + height - (item.total / max) * height;
-              ctx.beginPath();
-              ctx.arc(x, y, 4, 0, Math.PI * 2);
-              ctx.fill();
-              ctx.fillStyle = "#fff";
-              ctx.font = "12px Inter, sans-serif";
-              ctx.fillText(item.label, x - 20, padding + height + 18);
-              ctx.fillStyle = accent || "#a855f7";
-            });
+            const background = hexToRgba(accent, 0.2);
+            const borderHover = hexToRgba(accent, 0.35);
+            const maxValue = values.length ? Math.max(...values) : 0;
+            const suggestedMax = maxValue > 0 ? maxValue * 1.1 : undefined;
+
+            if (!chartInstance) {
+              chartInstance = new ChartLib(chartCanvas, {
+                type: "line",
+                data: {
+                  labels: [],
+                  datasets: [
+                    {
+                      label: "Monthly revenue",
+                      data: [],
+                      borderWidth: 3,
+                      tension: 0.35,
+                      fill: true,
+                    },
+                  ],
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  interaction: { intersect: false, mode: "index" },
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                      backgroundColor: "rgba(15, 23, 42, 0.9)",
+                      borderColor: "rgba(148, 163, 184, 0.2)",
+                      borderWidth: 1,
+                      padding: 12,
+                      callbacks: {
+                        title(context) {
+                          return context?.[0]?.label ?? "";
+                        },
+                        label(context) {
+                          const value = Number(context.parsed.y ?? 0);
+                          return `Revenue: $${value.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}`;
+                        },
+                      },
+                    },
+                  },
+                  scales: {
+                    x: {
+                      ticks: { color: "rgba(148, 163, 184, 0.85)" },
+                      grid: { color: "rgba(148, 163, 184, 0.15)" },
+                    },
+                    y: {
+                      beginAtZero: true,
+                      ticks: {
+                        color: "rgba(148, 163, 184, 0.85)",
+                        callback(value) {
+                          return `$${Number(value).toLocaleString()}`;
+                        },
+                      },
+                      grid: { color: "rgba(148, 163, 184, 0.12)" },
+                    },
+                  },
+                },
+              });
+            }
+
+            chartInstance.data.labels = labels;
+            const chartDataset = chartInstance.data.datasets[0];
+            chartDataset.data = values;
+            chartDataset.borderColor = accent;
+            chartDataset.backgroundColor = background;
+            chartDataset.pointBackgroundColor = accent;
+            chartDataset.pointBorderColor = borderHover;
+            chartDataset.pointHoverBackgroundColor = accent;
+            chartDataset.pointHoverBorderColor = hexToRgba(accent, 0.45);
+            chartDataset.pointRadius = 4;
+            chartDataset.pointHoverRadius = 6;
+            chartDataset.pointHitRadius = 20;
+
+            if (typeof suggestedMax === "number" && Number.isFinite(suggestedMax)) {
+              chartInstance.options.scales.y.suggestedMax = suggestedMax;
+            } else {
+              delete chartInstance.options.scales.y.suggestedMax;
+            }
+            chartInstance.update();
+
           };
 
           const renderHighlights = (dataset) => {
