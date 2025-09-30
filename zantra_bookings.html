@@ -36,6 +36,7 @@
       const supabaseUrl = "https://imqnxsrdwkgvjojsowj.supabase.co";
       const supabaseKey =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdX...";
+
       const supabaseClient =
         typeof window !== "undefined" && window.supabase
           ? window.supabase.createClient(supabaseUrl, supabaseKey)
@@ -3180,6 +3181,7 @@
 
         window.ZantraSync = Sync;
 
+
         const Auth = (() => {
           const client = globalThis.supabaseClient || null;
           const appShell = document.getElementById("app");
@@ -3243,6 +3245,7 @@
 
           const bootstrapApp = async () => {
             await AppStore.ready();
+
             if (!bootstrapped) {
               Tabs.show("dashboard");
               Calendar.init();
@@ -3265,6 +3268,7 @@
           };
 
           const handleSessionChange = async (session, eventType = "STATE_CHANGE") => {
+
             const wasAuthenticated = Boolean(activeUserId);
             if (session && session.user) {
               activeUserId = session.user.id;
@@ -3274,6 +3278,7 @@
               if (typeof Sync?.handleLogin === "function") {
                 Sync.handleLogin();
               }
+
               if (pendingLoginToast || (!wasAuthenticated && eventType === "INITIAL_SESSION")) {
                 Toast.show("Signed in successfully.", "success");
               }
@@ -3289,6 +3294,7 @@
               if (typeof Sync?.handleLogout === "function") {
                 Sync.handleLogout();
               }
+
               pendingLoginToast = false;
             }
           };
@@ -3319,6 +3325,7 @@
                     return;
                   }
                   await handleSessionChange(data.session, "MANUAL_SIGN_IN");
+
                 } catch (error) {
                   pendingLoginToast = false;
                   console.error("Failed to sign in", error);
@@ -3359,6 +3366,7 @@
               appShell.classList.remove("hidden");
               if (logoutButton) logoutButton.classList.add("hidden");
               await bootstrapApp();
+
               Toast.show("Authentication client unavailable. Loaded offline mode.", "warning");
               return;
             }
@@ -3373,6 +3381,7 @@
                 showScreen();
               } else if (data?.session?.user) {
                 await handleSessionChange(data.session, "INITIAL_SESSION");
+
               } else {
                 showScreen();
               }
@@ -3384,6 +3393,7 @@
 
             const { data: listener } = client.auth.onAuthStateChange(async (event, session) => {
               await handleSessionChange(session, event);
+
             });
 
             if (listener && typeof listener.subscription?.unsubscribe === "function") {
@@ -3408,6 +3418,7 @@
           if (typeof Sync?.init === "function") {
             Sync.init();
           }
+
           Auth.init();
         });
       })();
