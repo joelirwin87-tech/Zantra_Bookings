@@ -31,6 +31,21 @@
     </script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js"></script>
+    <script>
+      const supabaseUrl = "https://imqnxsrdwkgvjojsowj.supabase.co";
+      const supabaseKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdX...";
+      const supabaseClient =
+        typeof window !== "undefined" && window.supabase
+          ? window.supabase.createClient(supabaseUrl, supabaseKey)
+          : null;
+      if (supabaseClient) {
+        window.supabaseClient = supabaseClient;
+      } else {
+        console.error("Supabase client failed to initialize.");
+      }
+    </script>
 
     <style>
       :root {
@@ -437,6 +452,30 @@
       .hidden {
         display: none !important;
       }
+      .text-error {
+        color: #f87171;
+      }
+      .auth-container {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1.25rem;
+        background: rgba(2, 6, 23, 0.85);
+        backdrop-filter: blur(6px);
+        z-index: 950;
+      }
+      .auth-card {
+        width: min(100%, 420px);
+      }
+      .auth-card h2 {
+        font-size: 1.45rem;
+        margin-bottom: 0.35rem;
+      }
+      .auth-subtext {
+        margin: 0;
+      }
       @media (max-width: 600px) {
         .grid-2,
         .grid-3 {
@@ -466,7 +505,56 @@
       aria-live="assertive"
       aria-atomic="true"
     ></div>
-    <div class="app-shell" id="app">
+    <div
+      id="auth-container"
+      class="auth-container hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="login-title"
+    >
+      <form
+        id="login-form"
+        class="card auth-card"
+        autocomplete="off"
+        novalidate
+        aria-describedby="login-error"
+      >
+        <div class="grid gap-sm">
+          <div>
+            <h2 id="login-title">Sign in to Zantra Bookings</h2>
+            <p class="text-muted text-small auth-subtext">
+              Use your Zantra Supabase credentials to continue.
+            </p>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="login-email">Email</label>
+            <input
+              id="login-email"
+              name="email"
+              type="email"
+              required
+              autocomplete="email"
+              inputmode="email"
+            />
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="login-password">Password</label>
+            <input
+              id="login-password"
+              name="password"
+              type="password"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+          <p id="login-error" class="text-small text-error hidden" role="alert"></p>
+          <button id="login-submit" class="btn btn-primary" type="submit">
+            Sign in
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="app-shell hidden" id="app">
       <header class="card app-header">
         <div class="grid grid-2 gap-md items-start">
           <div class="header-brand">
@@ -488,6 +576,9 @@
               Quick Add Booking
             </button>
             <button id="quick-add-payment" class="btn" type="button">Record Payment</button>
+            <button id="logout-button" class="btn btn-ghost btn-sm hidden" type="button">
+              Log out
+            </button>
           </div>
         </div>
       </header>
@@ -2352,13 +2443,225 @@
           };
         })();
 
+        const Auth = (() => {
+          const client = globalThis.supabaseClient || null;
+          const appShell = document.getElementById("app");
+          const authScreen = document.getElementById("auth-container");
+          const loginForm = document.getElementById("login-form");
+          const emailInput = document.getElementById("login-email");
+          const passwordInput = document.getElementById("login-password");
+          const submitButton = document.getElementById("login-submit");
+          const errorNode = document.getElementById("login-error");
+          const logoutButton = document.getElementById("logout-button");
+
+          let activeUserId = null;
+          let bootstrapped = false;
+          let pendingLoginToast = false;
+          window.ZantraAuthUserId = null;
+
+          const setError = (message) => {
+            if (!errorNode) return;
+            if (message) {
+              errorNode.textContent = message;
+              errorNode.classList.remove("hidden");
+            } else {
+              errorNode.textContent = "";
+              errorNode.classList.add("hidden");
+            }
+          };
+
+          const setLoading = (isLoading) => {
+            if (submitButton) {
+              submitButton.disabled = isLoading;
+              submitButton.textContent = isLoading ? "Signing in..." : "Sign in";
+            }
+            if (emailInput) emailInput.disabled = isLoading;
+            if (passwordInput) passwordInput.disabled = isLoading;
+          };
+
+          const focusEmail = () => {
+            if (!emailInput) return;
+            requestAnimationFrame(() => {
+              emailInput.focus();
+            });
+          };
+
+          const showScreen = () => {
+            if (authScreen) authScreen.classList.remove("hidden");
+            if (appShell) appShell.classList.add("hidden");
+            if (logoutButton) logoutButton.classList.add("hidden");
+            setLoading(false);
+            if (passwordInput) passwordInput.value = "";
+            focusEmail();
+          };
+
+          const hideScreen = () => {
+            if (authScreen) authScreen.classList.add("hidden");
+            if (appShell) appShell.classList.remove("hidden");
+            if (logoutButton) logoutButton.classList.remove("hidden");
+            if (loginForm) loginForm.reset();
+            setError("");
+            setLoading(false);
+          };
+
+          const bootstrapApp = () => {
+            if (!bootstrapped) {
+              Tabs.show("dashboard");
+              Calendar.init();
+              Payments.init();
+              Settings.init();
+              Dashboard.refresh();
+              Reports.render();
+              bootstrapped = true;
+              return;
+            }
+            Tabs.show("dashboard");
+            if (typeof Calendar.resetFormState === "function") {
+              Calendar.resetFormState();
+            }
+            if (typeof Payments.refreshAll === "function") {
+              Payments.refreshAll();
+            }
+            Dashboard.refresh();
+            Reports.render();
+          };
+
+          const handleSessionChange = (session, eventType = "STATE_CHANGE") => {
+            const wasAuthenticated = Boolean(activeUserId);
+            if (session && session.user) {
+              activeUserId = session.user.id;
+              window.ZantraAuthUserId = activeUserId;
+              hideScreen();
+              bootstrapApp();
+              if (pendingLoginToast || (!wasAuthenticated && eventType === "INITIAL_SESSION")) {
+                Toast.show("Signed in successfully.", "success");
+              }
+              pendingLoginToast = false;
+            } else {
+              activeUserId = null;
+              window.ZantraAuthUserId = null;
+              setError("");
+              showScreen();
+              if (wasAuthenticated || eventType === "SIGNED_OUT") {
+                Toast.show("Signed out.", "info");
+              }
+              pendingLoginToast = false;
+            }
+          };
+
+          const bindEvents = () => {
+            if (loginForm) {
+              loginForm.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                if (!client) {
+                  setError("Authentication is unavailable. Please try again later.");
+                  return;
+                }
+                const formData = new FormData(loginForm);
+                const email = String(formData.get("email") || "").trim();
+                const password = String(formData.get("password") || "");
+                if (!email || !password) {
+                  setError("Email and password are required.");
+                  return;
+                }
+                setError("");
+                setLoading(true);
+                pendingLoginToast = true;
+                try {
+                  const { data, error } = await client.auth.signInWithPassword({ email, password });
+                  if (error || !data?.session) {
+                    pendingLoginToast = false;
+                    setError(error?.message || "Unable to sign in. Please check your credentials.");
+                    return;
+                  }
+                  handleSessionChange(data.session, "MANUAL_SIGN_IN");
+                } catch (error) {
+                  pendingLoginToast = false;
+                  console.error("Failed to sign in", error);
+                  setError("Unable to sign in. Please try again.");
+                } finally {
+                  setLoading(false);
+                }
+              });
+            }
+
+            if (logoutButton) {
+              logoutButton.addEventListener("click", async () => {
+                if (!client) return;
+                logoutButton.disabled = true;
+                try {
+                  const { error } = await client.auth.signOut();
+                  if (error) {
+                    Toast.show("Could not sign out. Please try again.", "error");
+                  }
+                } catch (error) {
+                  console.error("Failed to sign out", error);
+                  Toast.show("Could not sign out. Please try again.", "error");
+                } finally {
+                  logoutButton.disabled = false;
+                }
+              });
+            }
+          };
+
+          const init = async () => {
+            if (!appShell) {
+              console.error("Application shell is missing; cannot initialize auth.");
+              return;
+            }
+
+            if (!client) {
+              if (authScreen) authScreen.classList.add("hidden");
+              appShell.classList.remove("hidden");
+              if (logoutButton) logoutButton.classList.add("hidden");
+              bootstrapApp();
+              Toast.show("Authentication client unavailable. Loaded offline mode.", "warning");
+              return;
+            }
+
+            bindEvents();
+
+            try {
+              const { data, error } = await client.auth.getSession();
+              if (error) {
+                console.error("Failed to fetch session", error);
+                setError("Unable to verify session. Please sign in.");
+                showScreen();
+              } else if (data?.session?.user) {
+                handleSessionChange(data.session, "INITIAL_SESSION");
+              } else {
+                showScreen();
+              }
+            } catch (error) {
+              console.error("Session lookup failed", error);
+              setError("Unable to verify session. Please sign in.");
+              showScreen();
+            }
+
+            const { data: listener } = client.auth.onAuthStateChange((event, session) => {
+              handleSessionChange(session, event);
+            });
+
+            if (listener && typeof listener.subscription?.unsubscribe === "function") {
+              window.addEventListener("beforeunload", () => {
+                listener.subscription.unsubscribe();
+              });
+            }
+          };
+
+          const api = {
+            init,
+            getUserId: () => activeUserId,
+            isAuthenticated: () => Boolean(activeUserId),
+          };
+
+          window.ZantraAuth = api;
+
+          return api;
+        })();
+
         document.addEventListener("DOMContentLoaded", () => {
-          Tabs.show("dashboard");
-          Calendar.init();
-          Payments.init();
-          Settings.init();
-          Dashboard.refresh();
-          Reports.render();
+          Auth.init();
         });
       })();
     </script>
