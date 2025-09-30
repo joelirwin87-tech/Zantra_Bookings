@@ -1,1889 +1,2260 @@
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -1,47 +1,50 @@
- <!DOCTYPE html>
- <html lang="en">
-   <head>
-     <meta charset="UTF-8" />
-     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <title>Zantra Bookings Console</title>
-     <style>
-       :root {
-         color-scheme: dark;
-         font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
-           sans-serif;
-         --slate-100: #f8fafc;
-         --slate-950: #020617;
-         --slate-900: #0f172a;
-         --slate-800: #1e293b;
-         --slate-700: #334155;
-         --slate-600: #475569;
-         --slate-500: #64748b;
-         --slate-400: #94a3b8;
-         --slate-300: #cbd5f5;
--        --blue-500: #3b82f6;
--        --blue-400: #60a5fa;
-+        --brand-primary: #4b0082;
-+        --brand-primary-soft: #5f1aa6;
-+        --brand-primary-rgb: 75, 0, 130;
-+        --brand-accent: #a855f7;
-+        --brand-accent-rgb: 168, 85, 247;
-         --emerald-400: #34d399;
-         --amber-400: #fbbf24;
-         --white: #ffffff;
-       }
-       * {
-         box-sizing: border-box;
-       }
-       body {
-         margin: 0;
-         background-color: var(--slate-950);
-         color: var(--slate-100);
-         min-height: 100vh;
-         font-family: inherit;
-         line-height: 1.6;
-       }
-       h1,
-       h2,
-       h3,
-       h4,
-       h5,
-       h6 {
-         margin: 0;
-       }
-       a,
-       button,
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -51,51 +54,51 @@
-         font: inherit;
-         color: inherit;
-       }
-       button {
-         cursor: pointer;
-         border: none;
-         background: none;
-       }
-       input,
-       select,
-       textarea {
-         background-color: var(--slate-900);
-         border: 1px solid var(--slate-700);
-         color: inherit;
-         border-radius: 0.75rem;
-         padding: 0.5rem 0.75rem;
-       }
-       button:focus,
-       button:focus-visible,
-       input:focus,
-       input:focus-visible,
-       select:focus,
-       select:focus-visible,
-       textarea:focus,
-       textarea:focus-visible {
--        outline: 2px solid var(--blue-500);
-+        outline: 2px solid var(--brand-accent);
-         outline-offset: 2px;
-       }
-       .app-shell {
-         max-width: 1120px;
-         margin: 0 auto;
-         padding: 2rem 1.25rem;
-         display: grid;
-         gap: 1.5rem;
-       }
-       .card {
-         background: rgba(15, 23, 42, 0.75);
-         border: 1px solid rgba(148, 163, 184, 0.15);
-         border-radius: 1rem;
-         padding: 1.5rem;
-         box-shadow: 0 25px 60px rgba(2, 6, 23, 0.45);
-         backdrop-filter: blur(12px);
-       }
-       .grid {
-         display: grid;
-         gap: 1.25rem;
-       }
-       .grid-2 {
-         grid-template-columns: repeat(2, minmax(0, 1fr));
-       }
-       .grid-3 {
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -147,118 +150,164 @@
-         justify-content: space-between;
-       }
-       .justify-end {
-         justify-content: flex-end;
-       }
-       .list-plain {
-         list-style: none;
-         padding: 0;
-         margin: 0;
-         display: grid;
-         gap: 0.75rem;
-       }
-       .btn {
-         border-radius: 0.75rem;
-         padding: 0.5rem 1rem;
-         font-weight: 600;
-         transition: background 0.2s ease, transform 0.15s ease;
-         border: 1px solid rgba(148, 163, 184, 0.25);
-         background: rgba(15, 23, 42, 0.85);
-       }
-       .btn:hover {
-         transform: translateY(-1px);
-         background: rgba(15, 23, 42, 0.95);
-       }
-       .btn-primary {
--        background: var(--blue-500);
-+        background: var(--brand-primary);
-         color: var(--white);
-         border: none;
-       }
-       .btn-primary:hover {
--        background: var(--blue-400);
-+        background: var(--brand-primary-soft);
-       }
-       .btn-ghost {
-         padding: 0.35rem 0.6rem;
-         border-radius: 0.6rem;
-         border: 1px solid transparent;
-         background: transparent;
-       }
-       .btn-ghost:hover {
-         border-color: rgba(148, 163, 184, 0.35);
-         background: rgba(15, 23, 42, 0.6);
-       }
-       .btn-sm {
-         padding: 0.35rem 0.6rem;
-         font-size: 0.8rem;
-       }
-+      .app-header {
-+        background: linear-gradient(135deg, rgba(var(--brand-primary-rgb), 0.92), rgba(2, 6, 23, 0.92));
-+        border: 1px solid rgba(var(--brand-primary-rgb), 0.45);
-+      }
-+      .header-brand {
-+        display: flex;
-+        align-items: center;
-+        gap: 1rem;
-+      }
-+      .brand-logo {
-+        height: 48px;
-+        width: auto;
-+        flex-shrink: 0;
-+        border-radius: 0.5rem;
-+        display: block;
-+      }
-+      .brand-preview {
-+        display: grid;
-+        gap: 0.35rem;
-+        padding: 1rem;
-+        border-radius: 0.75rem;
-+        border: 1px solid rgba(var(--brand-accent-rgb), 0.4);
-+        background: rgba(15, 23, 42, 0.6);
-+      }
-+      .brand-preview h4 {
-+        color: var(--brand-accent);
-+      }
-+      .brand-preview-logo {
-+        height: 40px;
-+        width: auto;
-+        margin-bottom: 0.5rem;
-+        justify-self: start;
-+      }
-+      .form-field {
-+        display: grid;
-+        gap: 0.35rem;
-+      }
-+      .form-label {
-+        font-size: 0.9rem;
-+        font-weight: 600;
-+        color: var(--slate-300);
-+      }
-       .header-actions {
-         display: flex;
-         gap: 0.75rem;
-       }
-       nav ul {
-         list-style: none;
-         padding: 0;
-         margin: 0;
-         display: flex;
-         border: 1px solid rgba(148, 163, 184, 0.15);
-         border-radius: 0.75rem;
-         overflow: hidden;
-       }
-       nav li {
-         flex: 1 1 0;
-       }
-       nav button {
-         width: 100%;
-         padding: 0.75rem 1rem;
-         text-align: center;
-         font-weight: 600;
-         background: rgba(15, 23, 42, 0.6);
-         transition: background 0.2s ease;
-       }
-+      nav button:hover {
-+        background: rgba(var(--brand-primary-rgb), 0.12);
-+      }
-       nav button.active {
--        background: rgba(59, 130, 246, 0.15);
-+        background: rgba(var(--brand-primary-rgb), 0.15);
-+        color: var(--slate-100);
-       }
-       .calendar-grid {
-         display: grid;
-         grid-template-columns: repeat(7, minmax(0, 1fr));
-         gap: 0.5rem;
-       }
-       .calendar-cell {
-         position: relative;
-         min-height: 96px;
-         border-radius: 0.75rem;
-         border: 1px solid rgba(148, 163, 184, 0.15);
-         background: rgba(2, 6, 23, 0.85);
-         padding: 0.75rem;
-         text-align: left;
-         display: grid;
-         gap: 0.35rem;
-         align-content: start;
-       }
-       .calendar-cell.active {
--        border-color: var(--blue-500);
--        background: rgba(59, 130, 246, 0.18);
-+        border-color: var(--brand-accent);
-+        background: rgba(var(--brand-accent-rgb), 0.18);
-       }
-       .badge {
-         padding: 0.2rem 0.5rem;
-         border-radius: 999px;
-         font-size: 0.7rem;
-         text-transform: uppercase;
-         font-weight: 700;
-         letter-spacing: 0.04em;
-         display: inline-flex;
-         align-items: center;
-         gap: 0.35rem;
-       }
-       .badge-confirmed {
-         background: rgba(16, 185, 129, 0.12);
-         color: var(--emerald-400);
-       }
-       .badge-pending {
-         background: rgba(251, 191, 36, 0.12);
-         color: var(--amber-400);
-       }
-       .badge-default {
-         background: rgba(148, 163, 184, 0.12);
-         color: var(--slate-300);
-       }
-       .table {
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -296,91 +345,137 @@
-       }
-       .toast {
-         background: rgba(15, 23, 42, 0.95);
-         border: 1px solid rgba(148, 163, 184, 0.25);
-         border-radius: 0.9rem;
-         padding: 0.85rem 1rem;
-         box-shadow: 0 20px 45px rgba(2, 6, 23, 0.5);
-         opacity: 0;
-         transform: translateY(-10px);
-         transition: opacity 0.2s ease, transform 0.2s ease;
-         pointer-events: auto;
-       }
-       .toast.visible {
-         opacity: 1;
-         transform: translateY(0);
-       }
-       .toast[data-tone="success"] {
-         border-color: rgba(16, 185, 129, 0.5);
-       }
-       .toast[data-tone="error"] {
-         border-color: rgba(244, 63, 94, 0.5);
-       }
-       .toast[data-tone="warning"] {
-         border-color: rgba(251, 191, 36, 0.5);
-       }
-+      .toast[data-tone="info"] {
-+        border-color: rgba(var(--brand-accent-rgb), 0.5);
-+      }
-+      .notification-item {
-+        display: flex;
-+        gap: 0.75rem;
-+        padding: 0.75rem;
-+        border-radius: 0.75rem;
-+        background: rgba(15, 23, 42, 0.65);
-+        border: 1px solid rgba(148, 163, 184, 0.18);
-+        align-items: flex-start;
-+      }
-+      .notification-item[data-tone="info"] {
-+        border-left: 4px solid var(--brand-accent);
-+      }
-+      .notification-item[data-tone="warning"] {
-+        border-left: 4px solid var(--amber-400);
-+      }
-+      .notification-dot {
-+        margin-top: 0.2rem;
-+        width: 0.6rem;
-+        height: 0.6rem;
-+        border-radius: 999px;
-+        flex-shrink: 0;
-+      }
-+      .notification-dot.info {
-+        background-color: var(--brand-accent);
-+      }
-+      .notification-dot.warning {
-+        background-color: var(--amber-400);
-+      }
-+      .visually-hidden {
-+        position: absolute !important;
-+        height: 1px;
-+        width: 1px;
-+        overflow: hidden;
-+        clip: rect(1px, 1px, 1px, 1px);
-+        white-space: nowrap;
-+      }
-       .hidden {
-         display: none !important;
-       }
-       @media (max-width: 600px) {
-         .grid-2,
-         .grid-3 {
-           grid-template-columns: 1fr !important;
-         }
-         nav ul {
-           flex-direction: column;
-         }
-         .header-actions {
-           justify-content: flex-start;
-         }
-       }
-       @media (min-width: 900px) {
-         .grid-2 {
-           grid-template-columns: repeat(2, minmax(0, 1fr));
-         }
-         .grid-3 {
-           grid-template-columns: repeat(3, minmax(0, 1fr));
-         }
-       }
-     </style>
-   </head>
-   <body>
-     <div
-       id="toast-region"
-       class="toast-region"
-       aria-live="assertive"
-       aria-atomic="true"
-     ></div>
-     <div class="app-shell" id="app">
--      <header class="card">
-+      <header class="card app-header">
-         <div class="grid grid-2 gap-md items-start">
--          <div>
--            <h1 id="branding-title">Zantra Bookings Suite</h1>
--            <p class="text-muted mt-1">
--              Manage bookings, invoices, and brand preferences from a single enterprise-ready
--              console.
--            </p>
-+          <div class="header-brand">
-+            <img
-+              src="Zantra_Bookings_Logo.png"
-+              alt="Zantra Bookings Logo"
-+              class="brand-logo"
-+            />
-+            <div>
-+              <h1 id="branding-title">Zantra Bookings Suite</h1>
-+              <p class="text-muted mt-1">
-+                Manage bookings, invoices, and brand preferences from a single enterprise-ready
-+                console.
-+              </p>
-+            </div>
-           </div>
-           <div class="header-actions flex justify-end items-start flex-wrap">
-             <button id="quick-add-booking" class="btn btn-primary" type="button">
-               Quick Add Booking
-             </button>
-             <button id="quick-add-payment" class="btn" type="button">Record Payment</button>
-           </div>
-         </div>
-       </header>
- 
-       <nav role="tablist" aria-label="Primary sections">
-         <ul>
-           <li>
-             <button
-               class="tab-button active"
-               data-tab="dashboard"
-               type="button"
-               role="tab"
-               aria-selected="true"
-               aria-controls="tab-dashboard"
-               tabindex="0"
-             >
-               Dashboard
-             </button>
-           </li>
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -501,70 +596,87 @@
-               <div id="calendar-grid" class="calendar-grid mt-1" aria-live="polite"></div>
-             </div>
- 
-             <div class="card grid gap-md">
-               <div>
-                 <h3>Bookings on <span id="selected-date-label">Select a date</span></h3>
-                 <ul id="booking-list" class="list-plain mt-2"></ul>
-                 <p id="booking-empty" class="empty mt-1">No bookings scheduled yet.</p>
-               </div>
-               <form
-                 id="booking-form"
-                 class="grid gap-sm"
-                 autocomplete="off"
-                 aria-labelledby="booking-form-title"
-               >
-                 <div class="flex justify-between items-center">
-                   <h4 id="booking-form-title">Add booking</h4>
-                   <button
-                     id="booking-cancel-edit"
-                     type="button"
-                     class="btn btn-ghost btn-sm hidden"
-                   >
-                     Cancel edit
-                   </button>
-                 </div>
--                <label>Client name
--                  <input type="text" name="client" required placeholder="Client name" />
--                </label>
--                <label>Service
--                  <input type="text" name="service" required placeholder="Service description" />
--                </label>
--                <label>Start time
--                  <input type="time" name="startTime" required />
--                </label>
--                <label>End time
--                  <input type="time" name="endTime" required />
--                </label>
--                <label>Status
--                  <select name="status">
-+                <div class="form-field">
-+                  <label class="form-label" for="booking-client">Client name</label>
-+                  <input
-+                    id="booking-client"
-+                    type="text"
-+                    name="client"
-+                    required
-+                    placeholder="Client name"
-+                  />
-+                </div>
-+                <div class="form-field">
-+                  <label class="form-label" for="booking-service">Service</label>
-+                  <input
-+                    id="booking-service"
-+                    type="text"
-+                    name="service"
-+                    required
-+                    placeholder="Service description"
-+                  />
-+                </div>
-+                <div class="form-field">
-+                  <label class="form-label" for="booking-start">Start time</label>
-+                  <input id="booking-start" type="time" name="startTime" required />
-+                </div>
-+                <div class="form-field">
-+                  <label class="form-label" for="booking-end">End time</label>
-+                  <input id="booking-end" type="time" name="endTime" required />
-+                </div>
-+                <div class="form-field">
-+                  <label class="form-label" for="booking-status">Status</label>
-+                  <select id="booking-status" name="status">
-                     <option value="confirmed">Confirmed</option>
-                     <option value="pending">Pending</option>
-                     <option value="completed">Completed</option>
-                     <option value="cancelled">Cancelled</option>
-                   </select>
--                </label>
-+                </div>
-                 <button type="submit" class="btn btn-primary">Save booking</button>
-               </form>
-             </div>
-           </div>
-         </section>
- 
-         <section id="tab-payments" class="tab-panel hidden">
-           <div class="grid grid-2 gap-md">
-             <div class="card">
-               <div class="flex justify-between items-center">
-                 <h2>Invoices</h2>
-                 <button id="generate-invoice" class="btn btn-primary" type="button">
-                   Generate PDF Invoice
-                 </button>
-               </div>
-               <table class="table mt-2" aria-label="Invoices table">
-                 <thead>
-                   <tr>
-                     <th scope="col">Invoice #</th>
-                     <th scope="col">Booking</th>
-                     <th scope="col">Amount</th>
-                     <th scope="col">Status</th>
-                     <th scope="col">Due date</th>
-                     <th scope="col">Actions</th>
-                   </tr>
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -578,178 +690,226 @@
-               <h2>Payments</h2>
-               <table class="table mt-2" aria-label="Payments table">
-                 <thead>
-                   <tr>
-                     <th scope="col">Date</th>
-                     <th scope="col">Client</th>
-                     <th scope="col">Amount</th>
-                     <th scope="col">Method</th>
-                     <th scope="col">Reference</th>
-                     <th scope="col">Actions</th>
-                   </tr>
-                 </thead>
-                 <tbody id="payments-table"></tbody>
-               </table>
-               <p id="payments-empty" class="empty mt-1">No payments recorded yet.</p>
-             </div>
- 
-             <div class="card">
-               <h3 id="invoice-form-title">Create invoice</h3>
-               <form
-                 id="invoice-form"
-                 class="grid gap-sm mt-1"
-                 autocomplete="off"
-                 aria-labelledby="invoice-form-title"
-               >
--                <div class="flex justify-between items-center">
--                  <label class="flex-1">Booking
--                    <select name="bookingId" required></select>
--                  </label>
-+                <div class="flex justify-between items-center gap-sm">
-+                  <div class="form-field flex-1">
-+                    <label class="form-label" for="invoice-booking">Booking</label>
-+                    <select id="invoice-booking" name="bookingId" required></select>
-+                  </div>
-                   <button
-                     id="invoice-cancel-edit"
-                     type="button"
-                     class="btn btn-ghost btn-sm hidden"
-                   >
-                     Cancel edit
-                   </button>
-                 </div>
--                <label>Amount
--                  <input type="number" name="amount" step="0.01" min="0" required placeholder="0.00" />
--                </label>
--                <label>Due date
--                  <input type="date" name="dueDate" required />
--                </label>
-+                <div class="form-field">
-+                  <label class="form-label" for="invoice-amount">Amount</label>
-+                  <input
-+                    id="invoice-amount"
-+                    type="number"
-+                    name="amount"
-+                    step="0.01"
-+                    min="0"
-+                    required
-+                    placeholder="0.00"
-+                  />
-+                </div>
-+                <div class="form-field">
-+                  <label class="form-label" for="invoice-due">Due date</label>
-+                  <input id="invoice-due" type="date" name="dueDate" required />
-+                </div>
-                 <button type="submit" class="btn btn-primary">Save invoice</button>
-               </form>
-             </div>
- 
-             <div class="card">
-               <h3 id="payment-form-title">Record payment</h3>
-               <form
-                 id="payment-form"
-                 class="grid gap-sm mt-1"
-                 autocomplete="off"
-                 aria-labelledby="payment-form-title"
-               >
--                <div class="flex justify-between items-center">
--                  <label class="flex-1">Client
--                    <input type="text" name="client" required placeholder="Client name" />
--                  </label>
-+                <div class="flex justify-between items-center gap-sm">
-+                  <div class="form-field flex-1">
-+                    <label class="form-label" for="payment-client">Client</label>
-+                    <input
-+                      id="payment-client"
-+                      type="text"
-+                      name="client"
-+                      required
-+                      placeholder="Client name"
-+                    />
-+                  </div>
-                   <button
-                     id="payment-cancel-edit"
-                     type="button"
-                     class="btn btn-ghost btn-sm hidden"
-                   >
-                     Cancel edit
-                   </button>
-                 </div>
--                <label>Amount
--                  <input type="number" name="amount" step="0.01" min="0" required placeholder="0.00" />
--                </label>
--                <label>Method
--                  <select name="method">
-+                <div class="form-field">
-+                  <label class="form-label" for="payment-date">Payment date</label>
-+                  <input id="payment-date" type="date" name="date" required />
-+                </div>
-+                <div class="form-field">
-+                  <label class="form-label" for="payment-amount">Amount</label>
-+                  <input
-+                    id="payment-amount"
-+                    type="number"
-+                    name="amount"
-+                    step="0.01"
-+                    min="0"
-+                    required
-+                    placeholder="0.00"
-+                  />
-+                </div>
-+                <div class="form-field">
-+                  <label class="form-label" for="payment-method">Method</label>
-+                  <select id="payment-method" name="method">
-                     <option value="Card">Card</option>
-                     <option value="Cash">Cash</option>
-                     <option value="Transfer">Transfer</option>
-                     <option value="Other">Other</option>
-                   </select>
--                </label>
--                <label>Reference
--                  <input type="text" name="reference" placeholder="Optional reference" />
--                </label>
-+                </div>
-+                <div class="form-field">
-+                  <label class="form-label" for="payment-reference">Reference</label>
-+                  <input
-+                    id="payment-reference"
-+                    type="text"
-+                    name="reference"
-+                    placeholder="Optional reference"
-+                  />
-+                </div>
-                 <button type="submit" class="btn btn-primary">Save payment</button>
-               </form>
-             </div>
-           </div>
-         </section>
- 
-         <section id="tab-reports" class="tab-panel hidden">
-           <div class="grid grid-2 gap-md">
-             <div class="card">
-               <h2>Revenue trend</h2>
-               <canvas
-                 id="revenue-chart"
-                 class="mt-2"
-                 width="640"
-                 height="320"
-                 role="img"
-                 aria-label="Revenue trend chart"
-+                aria-describedby="revenue-chart-summary report-highlights"
-               ></canvas>
-+              <p id="revenue-chart-summary" class="visually-hidden">
-+                Revenue trend chart with no data yet.
-+              </p>
-               <p id="revenue-chart-empty" class="empty mt-1">
-                 Add payments to generate the revenue chart.
-               </p>
-             </div>
-             <div class="card">
-               <h2>Highlights</h2>
-               <ul id="report-highlights" class="list-plain mt-2"></ul>
-               <p id="report-empty" class="empty mt-1">
-                 When payments are logged the highlights will appear here.
-               </p>
-             </div>
-           </div>
-           <div class="card flex flex-wrap gap-sm mt-2">
-             <button class="btn" data-export="bookings" type="button">Export bookings CSV</button>
-             <button class="btn" data-export="invoices" type="button">Export invoices CSV</button>
-             <button class="btn" data-export="payments" type="button">Export payments CSV</button>
-           </div>
-         </section>
- 
-         <section id="tab-settings" class="tab-panel hidden">
-           <div class="grid grid-2 gap-md">
-             <div class="card">
-               <h2 id="settings-form-title">Brand identity</h2>
-               <form
-                 id="settings-form"
-                 class="grid gap-sm mt-1"
-                 autocomplete="off"
-                 aria-labelledby="settings-form-title"
-               >
--                <label>Business name
--                  <input type="text" name="name" required />
--                </label>
--                <label>Support email
--                  <input type="email" name="email" required />
--                </label>
--                <label>Phone
--                  <input type="text" name="phone" />
--                </label>
--                <label>Accent color
--                  <input type="color" name="color" />
--                </label>
--                <label>Address
--                  <textarea name="address" rows="3"></textarea>
--                </label>
-+                <div class="form-field">
-+                  <label class="form-label" for="settings-name">Business name</label>
-+                  <input id="settings-name" type="text" name="name" required />
-+                </div>
-+                <div class="form-field">
-+                  <label class="form-label" for="settings-email">Support email</label>
-+                  <input id="settings-email" type="email" name="email" required />
-+                </div>
-+                <div class="form-field">
-+                  <label class="form-label" for="settings-phone">Phone</label>
-+                  <input id="settings-phone" type="text" name="phone" />
-+                </div>
-+                <div class="form-field">
-+                  <label class="form-label" for="settings-color">Accent color</label>
-+                  <input id="settings-color" type="color" name="color" />
-+                </div>
-+                <div class="form-field">
-+                  <label class="form-label" for="settings-address">Address</label>
-+                  <textarea id="settings-address" name="address" rows="3"></textarea>
-+                </div>
-                 <button type="submit" class="btn btn-primary">Update branding</button>
-               </form>
-             </div>
-             <div class="card">
-               <h3>Brand preview</h3>
--              <div
--                id="brand-preview"
--                class="mt-1"
--                style="padding: 1rem; border-radius: 0.75rem; border: 1px solid rgba(148, 163, 184, 0.2);"
--              >
-+              <div id="brand-preview" class="brand-preview mt-1">
-+                <img
-+                  src="Zantra_Bookings_Logo.png"
-+                  alt="Zantra Bookings Logo"
-+                  class="brand-logo brand-preview-logo"
-+                />
-                 <h4 id="brand-preview-name" style="font-size: 1.35rem;">Zantra Studios</h4>
-                 <p id="brand-preview-email" class="text-muted">team@zantra.com</p>
-                 <p id="brand-preview-phone" class="text-muted">+1 (555) 123-4567</p>
-                 <p id="brand-preview-address" class="text-small text-muted mt-1">
-                   123 Market Street, Suite 400, San Francisco, CA
-                 </p>
-               </div>
-               <div class="text-muted text-small mt-2">
-                 <p class="mt-0">Tips:</p>
-                 <ul class="mt-1" style="margin-left: 1.25rem;">
-                   <li>Keep the accent colour aligned with your design system.</li>
-                   <li>Ensure support details stay current for invoices.</li>
-                   <li>Update settings before exporting PDFs to refresh branding.</li>
-                 </ul>
-               </div>
-             </div>
-           </div>
-         </section>
-       </main>
-     </div>
-     <script>
-       (function () {
-         "use strict";
- 
-         const safeClone = globalThis.structuredClone ?? ((obj) =>
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -778,99 +938,165 @@
-               return null;
-             }
-             const candidate = new Date(year, monthIndex, day);
-             if (
-               candidate.getFullYear() !== year ||
-               candidate.getMonth() !== monthIndex ||
-               candidate.getDate() !== day
-             ) {
-               return null;
-             }
-             return candidate;
-           };
-           const todayIso = () => toIso(new Date());
-           const display = (isoString) => {
-             const parsed = fromIso(isoString);
-             if (!parsed) return "—";
-             return parsed.toLocaleDateString(undefined, {
-               month: "short",
-               day: "numeric",
-               year: "numeric",
-             });
-           };
-           return { toIso, fromIso, todayIso, display };
-         })();
- 
-+        const TextUtils = (() => {
-+          const FALLBACK = "zantra";
-+          const sanitizeFileSegment = (value, fallback = FALLBACK) => {
-+            const lower = String(value ?? "").toLowerCase();
-+            const sanitized = lower.replace(/[^a-z0-9_-]+/g, "-").replace(/-+/g, "-").replace(/^[-_]+|[-_]+$/g, "");
-+            return sanitized || fallback;
-+          };
-+          const escapeCsvCell = (value) => {
-+            const stringValue = String(value ?? "");
-+            const cleaned = stringValue.replace(/\r\n|\n|\r/g, " ");
-+            const leadingWhitespaceMatch = cleaned.match(/^\s*/);
-+            const leadingWhitespace = leadingWhitespaceMatch ? leadingWhitespaceMatch[0] : "";
-+            const trimmed = cleaned.slice(leadingWhitespace.length);
-+            const needsQuotePrefix = /^[=+\-@]/.test(trimmed);
-+            const safeValue = needsQuotePrefix ? `${leadingWhitespace}'${trimmed}` : cleaned;
-+            const escaped = safeValue.replace(/"/g, '""');
-+            return `"${escaped}"`;
-+          };
-+          return { sanitizeFileSegment, escapeCsvCell };
-+        })();
-+
-         const Toast = (() => {
-           const region = document.getElementById("toast-region");
--          let hideTimer = null;
--          let removeTimer = null;
-+          const timers = new WeakMap();
-+          const maxVisible = 4;
-+
-+          const removeToast = (toast) => {
-+            if (!toast) return;
-+            const existing = timers.get(toast);
-+            if (existing?.hideTimer) window.clearTimeout(existing.hideTimer);
-+            if (existing?.removeTimer) window.clearTimeout(existing.removeTimer);
-+            toast.classList.remove("visible");
-+            const removeTimer = window.setTimeout(() => {
-+              toast.remove();
-+              timers.delete(toast);
-+            }, 250);
-+            timers.set(toast, { hideTimer: null, removeTimer });
-+          };
-+
-+          const queueRemoval = (toast, duration) => {
-+            const hideTimer = window.setTimeout(() => removeToast(toast), Math.max(duration, 1600));
-+            timers.set(toast, { hideTimer, removeTimer: null });
-+          };
-+
-           const show = (message, tone = "info", options = {}) => {
-             if (!region || !message) return;
--            region.querySelectorAll(".toast").forEach((toast) => toast.remove());
--            if (hideTimer) {
--              clearTimeout(hideTimer);
--              hideTimer = null;
--            }
--            if (removeTimer) {
--              clearTimeout(removeTimer);
--              removeTimer = null;
--            }
-             const toast = document.createElement("div");
-             toast.className = "toast";
-             toast.dataset.tone = tone;
-             toast.setAttribute("role", "alert");
-             toast.textContent = message;
-+            if (region.children.length >= maxVisible) {
-+              removeToast(region.firstElementChild);
-+            }
-             region.appendChild(toast);
-             requestAnimationFrame(() => toast.classList.add("visible"));
-             const duration = Number.isFinite(options.duration) ? options.duration : 4000;
--            hideTimer = window.setTimeout(() => {
--              toast.classList.remove("visible");
--              removeTimer = window.setTimeout(() => {
--                toast.remove();
--                removeTimer = null;
--              }, 250);
--              hideTimer = null;
--            }, Math.max(duration, 1600));
-+            queueRemoval(toast, duration);
-+            toast.addEventListener("click", () => removeToast(toast));
-           };
-+
-           return { show };
-         })();
- 
-         const STORAGE_KEY = "zantra_bookings_v2";
-         const defaultState = {
-           bookings: [],
-           invoices: [],
-           payments: [],
-           settings: {
-             name: "Zantra Studios",
-             email: "team@zantra.com",
-             phone: "+1 (555) 123-4567",
--            color: "#3b82f6",
-+            color: "#a855f7",
-             address: "123 Market Street, Suite 400, San Francisco, CA",
-           },
-         };
- 
-+        const Theme = (() => {
-+          const FALLBACK = defaultState.settings.color;
-+          const normalize = (value) => {
-+            if (typeof value !== "string") return FALLBACK;
-+            const trimmed = value.trim();
-+            if (!/^#?[0-9a-f]{3,6}$/i.test(trimmed)) return FALLBACK;
-+            let hex = trimmed.startsWith("#") ? trimmed.slice(1) : trimmed;
-+            if (hex.length === 3) {
-+              hex = hex
-+                .split("")
-+                .map((char) => char + char)
-+                .join("");
-+            }
-+            return `#${hex.slice(0, 6)}`;
-+          };
-+          const hexToRgb = (hex) => {
-+            if (!/^#[0-9a-f]{6}$/i.test(hex)) return null;
-+            const value = hex.slice(1);
-+            const bigint = parseInt(value, 16);
-+            return [
-+              (bigint >> 16) & 255,
-+              (bigint >> 8) & 255,
-+              bigint & 255,
-+            ];
-+          };
-+          const setAccent = (value) => {
-+            const normalized = normalize(value);
-+            document.documentElement.style.setProperty("--brand-accent", normalized);
-+            const rgb = hexToRgb(normalized);
-+            if (rgb) {
-+              document.documentElement.style.setProperty("--brand-accent-rgb", rgb.join(", "));
-+            }
-+          };
-+          setAccent(FALLBACK);
-+          return { setAccent };
-+        })();
-+
-         const AppStore = (() => {
-           let state = load();
- 
-           function load() {
-             try {
-               const raw = localStorage.getItem(STORAGE_KEY);
-               if (!raw) return safeClone(defaultState);
-               const parsed = JSON.parse(raw);
-               return {
-                 bookings: Array.isArray(parsed.bookings) ? parsed.bookings : [],
-                 invoices: Array.isArray(parsed.invoices) ? parsed.invoices : [],
-                 payments: Array.isArray(parsed.payments) ? parsed.payments : [],
-                 settings: Object.assign({}, defaultState.settings, parsed.settings || {}),
-               };
-             } catch (error) {
-               console.error("Failed to load persisted data", error);
-               Toast.show("Could not load saved data. Using defaults.", "warning");
-               return safeClone(defaultState);
-             }
-           }
- 
-           function persist() {
-             try {
-               localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-             } catch (error) {
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -1057,94 +1283,117 @@
-           };
- 
-           buttons.forEach((button) =>
-             button.addEventListener("click", () => show(button.dataset.tab))
-           );
- 
-           return { show };
-         })();
- 
-         const Calendar = (() => {
-           const grid = document.getElementById("calendar-grid");
-           const monthLabel = document.getElementById("calendar-month");
-           const selectedLabel = document.getElementById("selected-date-label");
-           const bookingList = document.getElementById("booking-list");
-           const bookingEmpty = document.getElementById("booking-empty");
-           const prevBtn = document.getElementById("calendar-prev");
-           const nextBtn = document.getElementById("calendar-next");
-           const form = document.getElementById("booking-form");
-           const cancelEditBtn = document.getElementById("booking-cancel-edit");
-           const submitBtn = form.querySelector('button[type="submit"]');
- 
-           let activeDate = new Date();
-           let selectedIso = null;
-           let editingId = null;
- 
-+          const setDefaultBookingTimes = (force = false) => {
-+            if (!selectedIso || editingId) return;
-+            const startField = document.getElementById("booking-start");
-+            const endField = document.getElementById("booking-end");
-+            if (!startField || !endField) return;
-+            const selectedDate = DateUtils.fromIso(selectedIso) || new Date();
-+            const slot = new Date();
-+            slot.setFullYear(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-+            slot.setSeconds(0, 0);
-+            const minutes = slot.getMinutes();
-+            const remainder = minutes % 30;
-+            if (remainder !== 0) {
-+              slot.setMinutes(minutes + (30 - remainder));
-+            }
-+            const start = new Date(slot);
-+            const end = new Date(start.getTime() + 60 * 60 * 1000);
-+            const format = (date) =>
-+              `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
-+            if (force || !startField.value) startField.value = format(start);
-+            if (force || !endField.value) endField.value = format(end);
-+          };
-+
-           const renderCalendar = () => {
-             const year = activeDate.getFullYear();
-             const month = activeDate.getMonth();
-             const first = new Date(year, month, 1);
-             const last = new Date(year, month + 1, 0);
- 
-             monthLabel.textContent = activeDate.toLocaleDateString(undefined, {
-               month: "long",
-               year: "numeric",
-             });
- 
-             grid.innerHTML = "";
-             for (let i = 0; i < first.getDay(); i += 1) {
-               const placeholder = document.createElement("div");
-               placeholder.setAttribute("aria-hidden", "true");
-               grid.appendChild(placeholder);
-             }
- 
-             for (let day = 1; day <= last.getDate(); day += 1) {
-               const current = new Date(year, month, day);
-               const iso = DateUtils.toIso(current);
-               const cell = document.createElement("button");
-               cell.type = "button";
-               cell.className = "calendar-cell";
-               cell.setAttribute("aria-label", `${current.toDateString()}`);
-               if (iso === selectedIso) cell.classList.add("active");
-               const strong = document.createElement("strong");
-               strong.textContent = String(day);
-               const count = document.createElement("span");
-               count.className = "text-subtle text-xs";
-               const bookingsCount = AppStore.getBookingsByDate(iso).length;
-               count.textContent = `${bookingsCount} booking${bookingsCount === 1 ? "" : "s"}`;
-               cell.append(strong, count);
-               cell.addEventListener("click", () => selectDate(iso));
-               grid.appendChild(cell);
-             }
-           };
- 
-           const resetFormState = () => {
-             editingId = null;
-             form.reset();
-             submitBtn.textContent = "Save booking";
-             cancelEditBtn.classList.add("hidden");
-             form.removeAttribute("data-editing-id");
-+            setDefaultBookingTimes(true);
-           };
- 
-           const renderBookings = () => {
-             bookingList.innerHTML = "";
-             if (!selectedIso) {
-               bookingEmpty.classList.remove("hidden");
-               return;
-             }
-             const bookings = AppStore.getBookingsByDate(selectedIso).sort((a, b) =>
-               a.startTime.localeCompare(b.startTime)
-             );
-             if (bookings.length === 0) {
-               bookingEmpty.classList.remove("hidden");
-               return;
-             }
-             bookingEmpty.classList.add("hidden");
-             bookings.forEach((booking) => {
-               const item = document.createElement("li");
-               const headerRow = document.createElement("div");
-               headerRow.className = "flex justify-between items-center";
- 
-               const client = document.createElement("span");
-               client.textContent = booking.client;
-               client.style.fontWeight = "700";
- 
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -1162,88 +1411,89 @@
-               const service = document.createElement("div");
-               service.className = "text-muted text-small";
-               service.textContent = booking.service;
- 
-               const timing = document.createElement("div");
-               timing.className = "text-subtle text-xs";
-               timing.textContent = `${DateUtils.display(booking.date)} • ${booking.startTime} - ${booking.endTime}`;
- 
-               const actions = document.createElement("div");
-               actions.className = "table-actions";
- 
-               const editBtn = document.createElement("button");
-               editBtn.type = "button";
-               editBtn.className = "btn btn-ghost btn-sm";
-               editBtn.textContent = "Edit";
-               editBtn.addEventListener("click", () => {
-                 editingId = booking.id;
-                 form.dataset.editingId = booking.id;
-                 submitBtn.textContent = "Update booking";
-                 cancelEditBtn.classList.remove("hidden");
-                 form.client.value = booking.client;
-                 form.service.value = booking.service;
-                 form.startTime.value = booking.startTime;
-                 form.endTime.value = booking.endTime;
-                 form.status.value = booking.status;
--                form.querySelector('input[name="client"]').focus();
-+                document.getElementById("booking-client").focus();
-               });
- 
-               const deleteBtn = document.createElement("button");
-               deleteBtn.type = "button";
-               deleteBtn.className = "btn btn-ghost btn-sm";
-               deleteBtn.textContent = "Delete";
-               deleteBtn.addEventListener("click", () => {
-                 if (!AppStore.removeBooking(booking.id)) return;
-                 if (editingId === booking.id) {
-                   resetFormState();
-                 }
-                 renderCalendar();
-                 renderBookings();
-                 Dashboard.refresh();
-                 Payments.refreshAll();
-                 Reports.render();
-                 Toast.show("Booking removed.", "success");
-               });
- 
-               actions.append(editBtn, deleteBtn);
- 
-               item.append(headerRow, service, timing, actions);
-               bookingList.appendChild(item);
-             });
-           };
- 
-           const selectDate = (iso) => {
-             selectedIso = iso;
-             selectedLabel.textContent = DateUtils.display(iso);
-             if (editingId) {
-               const editingBooking = AppStore.getBookingById(editingId);
-               if (!editingBooking || editingBooking.date !== iso) {
-                 resetFormState();
-               }
-             }
-             renderCalendar();
-             renderBookings();
-+            setDefaultBookingTimes();
-           };
- 
-           form.addEventListener("submit", (event) => {
-             event.preventDefault();
-             if (!selectedIso) {
-               Toast.show("Select a date on the calendar before adding a booking.", "error");
-               return;
-             }
-             const formData = new FormData(form);
-             const client = String(formData.get("client") || "").trim();
-             const service = String(formData.get("service") || "").trim();
-             const startTime = String(formData.get("startTime") || "").trim();
-             const endTime = String(formData.get("endTime") || "").trim();
-             const status = String(formData.get("status") || "confirmed");
-             if (!client || !service) {
-               Toast.show("Client and service are required.", "error");
-               return;
-             }
-             if (endTime <= startTime) {
-               Toast.show("End time must be after start time.", "error");
-               return;
-             }
-             if (editingId) {
-               AppStore.updateBooking(editingId, {
-                 client,
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -1273,51 +1523,52 @@
-             Reports.render();
-           });
- 
-           cancelEditBtn.addEventListener("click", () => {
-             resetFormState();
-           });
- 
-           prevBtn.addEventListener("click", () => {
-             activeDate = new Date(activeDate.getFullYear(), activeDate.getMonth() - 1, 1);
-             renderCalendar();
-           });
- 
-           nextBtn.addEventListener("click", () => {
-             activeDate = new Date(activeDate.getFullYear(), activeDate.getMonth() + 1, 1);
-             renderCalendar();
-           });
- 
-           document.getElementById("quick-add-booking").addEventListener("click", () => {
-             Tabs.show("bookings");
-             const today = DateUtils.todayIso();
-             const parsed = DateUtils.fromIso(today);
-             if (parsed) {
-               activeDate = parsed;
-               selectDate(today);
-             }
--            form.querySelector('input[name="client"]').focus();
-+            document.getElementById("booking-client").focus();
-+            setDefaultBookingTimes(true);
-           });
- 
-           return {
-             init() {
-               renderCalendar();
-             },
-             selectDate,
-             resetFormState,
-           };
-         })();
- 
-         const Payments = (() => {
-           const invoiceForm = document.getElementById("invoice-form");
-           const invoiceSelect = invoiceForm.querySelector('select[name="bookingId"]');
-           const invoiceTable = document.getElementById("invoice-table");
-           const invoiceEmpty = document.getElementById("invoice-empty");
-           const invoiceCancelEdit = document.getElementById("invoice-cancel-edit");
-           const invoiceSubmit = invoiceForm.querySelector('button[type="submit"]');
- 
-           const paymentsTable = document.getElementById("payments-table");
-           const paymentsEmpty = document.getElementById("payments-empty");
-           const paymentForm = document.getElementById("payment-form");
-           const paymentCancelEdit = document.getElementById("payment-cancel-edit");
-           const paymentSubmit = paymentForm.querySelector('button[type="submit"]');
- 
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -1338,98 +1589,105 @@
-             }
-             invoiceSelect.disabled = false;
-             bookings.forEach((booking) => {
-               const option = document.createElement("option");
-               option.value = booking.id;
-               option.textContent = `${booking.client} — ${DateUtils.display(booking.date)} (${booking.service})`;
-               invoiceSelect.appendChild(option);
-             });
-           };
- 
-           const resetInvoiceForm = () => {
-             editingInvoiceId = null;
-             invoiceForm.reset();
-             invoiceSubmit.textContent = "Save invoice";
-             invoiceCancelEdit.classList.add("hidden");
-             invoiceForm.removeAttribute("data-editing-id");
-             refreshInvoiceOptions();
-           };
- 
-           const resetPaymentForm = () => {
-             editingPaymentId = null;
-             paymentForm.reset();
-             paymentSubmit.textContent = "Save payment";
-             paymentCancelEdit.classList.add("hidden");
-             paymentForm.removeAttribute("data-editing-id");
-+            if (paymentForm.date) {
-+              const today = DateUtils.todayIso();
-+              paymentForm.date.value = today;
-+            }
-+            if (paymentForm.method) {
-+              paymentForm.method.value = "Card";
-+            }
-           };
- 
-           const renderInvoices = () => {
-             const invoices = AppStore.getInvoices();
-             const bookings = new Map(
-               AppStore.getAllBookings().map((booking) => [booking.id, booking])
-             );
-             invoiceTable.innerHTML = "";
-             if (invoices.length === 0) {
-               invoiceEmpty.classList.remove("hidden");
-             } else {
-               invoiceEmpty.classList.add("hidden");
-             }
-             invoices.forEach((invoice) => {
-               const row = document.createElement("tr");
- 
-               const numberCell = document.createElement("td");
-               numberCell.textContent = invoice.number || "—";
- 
-               const bookingCell = document.createElement("td");
-               const booking = bookings.get(invoice.bookingId);
-               bookingCell.textContent = booking
-                 ? `${booking.client} — ${booking.service}`
-                 : "Booking archived";
- 
-               const amountCell = document.createElement("td");
-               amountCell.textContent = `$${Number(invoice.amount || 0).toFixed(2)}`;
- 
-               const statusCell = document.createElement("td");
-               const statusSelect = document.createElement("select");
-               statusSelect.dataset.id = invoice.id;
-               ["draft", "sent", "paid", "overdue"].forEach((optionValue) => {
-                 const option = document.createElement("option");
-                 option.value = optionValue;
-                 option.textContent = optionValue.charAt(0).toUpperCase() + optionValue.slice(1);
-                 if (invoice.status === optionValue) option.selected = true;
-                 statusSelect.appendChild(option);
-               });
-               statusSelect.addEventListener("change", (event) => {
-                 AppStore.updateInvoiceStatus(event.target.dataset.id, event.target.value);
-                 Dashboard.refresh();
-                 Reports.render();
-                 Toast.show("Invoice status updated.", "success", { duration: 2500 });
-               });
-               statusCell.appendChild(statusSelect);
- 
-               const dueDateCell = document.createElement("td");
--              dueDateCell.textContent = invoice.dueDate || "—";
-+              dueDateCell.textContent = DateUtils.display(invoice.dueDate);
- 
-               const actionsCell = document.createElement("td");
-               actionsCell.className = "table-actions";
-               const editBtn = document.createElement("button");
-               editBtn.type = "button";
-               editBtn.className = "btn btn-ghost btn-sm";
-               editBtn.textContent = "Edit";
-               editBtn.addEventListener("click", () => {
-                 editingInvoiceId = invoice.id;
-                 invoiceForm.dataset.editingId = invoice.id;
-                 invoiceSubmit.textContent = "Update invoice";
-                 invoiceCancelEdit.classList.remove("hidden");
-                 refreshInvoiceOptions();
-                 invoiceSelect.value = invoice.bookingId || "";
-                 invoiceForm.amount.value = Number(invoice.amount || 0).toFixed(2);
-                 invoiceForm.dueDate.value = invoice.dueDate || "";
-                 invoiceSelect.focus();
-               });
- 
-               const deleteBtn = document.createElement("button");
-               deleteBtn.type = "button";
-               deleteBtn.className = "btn btn-ghost btn-sm";
-               deleteBtn.textContent = "Delete";
-               deleteBtn.addEventListener("click", () => {
-                 if (!AppStore.removeInvoice(invoice.id)) return;
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -1465,54 +1723,55 @@
- 
-               const clientCell = document.createElement("td");
-               clientCell.textContent = payment.client;
- 
-               const amountCell = document.createElement("td");
-               amountCell.textContent = `$${Number(payment.amount || 0).toFixed(2)}`;
- 
-               const methodCell = document.createElement("td");
-               methodCell.textContent = payment.method;
- 
-               const referenceCell = document.createElement("td");
-               referenceCell.textContent = payment.reference || "—";
- 
-               const actionsCell = document.createElement("td");
-               actionsCell.className = "table-actions";
-               const editBtn = document.createElement("button");
-               editBtn.type = "button";
-               editBtn.className = "btn btn-ghost btn-sm";
-               editBtn.textContent = "Edit";
-               editBtn.addEventListener("click", () => {
-                 editingPaymentId = payment.id;
-                 paymentForm.dataset.editingId = payment.id;
-                 paymentSubmit.textContent = "Update payment";
-                 paymentCancelEdit.classList.remove("hidden");
-                 paymentForm.client.value = payment.client;
-+                paymentForm.date.value = payment.date || DateUtils.todayIso();
-                 paymentForm.amount.value = Number(payment.amount || 0).toFixed(2);
-                 paymentForm.method.value = payment.method;
-                 paymentForm.reference.value = payment.reference || "";
--                paymentForm.client.focus();
-+                document.getElementById("payment-client").focus();
-               });
- 
-               const deleteBtn = document.createElement("button");
-               deleteBtn.type = "button";
-               deleteBtn.className = "btn btn-ghost btn-sm";
-               deleteBtn.textContent = "Delete";
-               deleteBtn.addEventListener("click", () => {
-                 if (!AppStore.removePayment(payment.id)) return;
-                 if (editingPaymentId === payment.id) {
-                   resetPaymentForm();
-                 }
-                 renderPayments();
-                 Dashboard.refresh();
-                 Reports.render();
-                 Toast.show("Payment removed.", "success");
-               });
- 
-               actionsCell.append(editBtn, deleteBtn);
- 
-               row.append(dateCell, clientCell, amountCell, methodCell, referenceCell, actionsCell);
-               paymentsTable.appendChild(row);
-             });
-           };
- 
-           invoiceForm.addEventListener("submit", (event) => {
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -1548,297 +1807,320 @@
-                   ? AppStore.getInvoiceById(editingInvoiceId).status || "draft"
-                   : "draft",
-             };
-             if (editingInvoiceId) {
-               AppStore.updateInvoice(editingInvoiceId, payload);
-               Toast.show("Invoice updated.", "success");
-             } else {
-               AppStore.addInvoice(payload);
-               Toast.show("Invoice created.", "success");
-             }
-             resetInvoiceForm();
-             renderInvoices();
-             Dashboard.refresh();
-             Reports.render();
-           });
- 
-           invoiceCancelEdit.addEventListener("click", () => {
-             resetInvoiceForm();
-           });
- 
-           paymentForm.addEventListener("submit", (event) => {
-             event.preventDefault();
-             const data = new FormData(paymentForm);
-             const client = String(data.get("client") || "").trim();
-             const amount = Number(data.get("amount"));
-+            const dateValue = String(data.get("date") || "").trim();
-             if (!client) {
-               Toast.show("Client is required.", "error");
-               return;
-             }
-             if (!Number.isFinite(amount) || amount <= 0) {
-               Toast.show("Payment amount must be greater than zero.", "error");
-               return;
-             }
-+            if (!DateUtils.fromIso(dateValue)) {
-+              Toast.show("Provide a valid payment date.", "error");
-+              return;
-+            }
-             const payload = {
--              date:
--                editingPaymentId && AppStore.getPaymentById(editingPaymentId)
--                  ? AppStore.getPaymentById(editingPaymentId).date
--                  : DateUtils.todayIso(),
-+              date: dateValue,
-               client,
-               amount,
-               method: String(data.get("method") || "Card"),
-               reference: String(data.get("reference") || "").trim(),
-             };
-             if (editingPaymentId) {
-               AppStore.updatePayment(editingPaymentId, payload);
-               Toast.show("Payment updated.", "success");
-             } else {
-               AppStore.addPayment(payload);
-               Toast.show("Payment recorded.", "success");
-             }
-             resetPaymentForm();
-             renderPayments();
-             Dashboard.refresh();
-             Reports.render();
-           });
- 
-           paymentCancelEdit.addEventListener("click", () => {
-             resetPaymentForm();
-           });
- 
-           document.getElementById("quick-add-payment").addEventListener("click", () => {
-             Tabs.show("payments");
--            paymentForm.querySelector('input[name="client"]').focus();
-+            resetPaymentForm();
-+            if (paymentForm.date) {
-+              paymentForm.date.value = DateUtils.todayIso();
-+            }
-+            document.getElementById("payment-client").focus();
-           });
- 
-           document.getElementById("generate-invoice").addEventListener("click", () => {
-             const invoices = AppStore.getInvoices();
-             if (invoices.length === 0) {
-               Toast.show("Create an invoice before exporting.", "warning");
-               return;
-             }
-             const settings = AppStore.settings;
-             const bookingIndex = new Map(
-               AppStore.getAllBookings().map((booking) => [booking.id, booking])
-             );
-             const doc = [
-               `${settings.name} • Invoice Summary`,
-               `Generated: ${new Date().toLocaleString()}`,
-               "",
-               ...invoices.map((invoice) => {
-                 const booking = bookingIndex.get(invoice.bookingId);
-+                const dueDisplay = DateUtils.display(invoice.dueDate);
-                 return `${invoice.number || "INV"} • ${booking ? booking.client : "Booking archived"} • $${Number(
-                   invoice.amount || 0
--                ).toFixed(2)} • ${(invoice.status || "draft").toUpperCase()} • Due ${invoice.dueDate || "—"}`;
-+                ).toFixed(2)} • ${(invoice.status || "draft").toUpperCase()} • Due ${dueDisplay}`;
-               }),
-             ].join("\n");
-             const blob = new Blob([doc], { type: "text/plain;charset=utf-8" });
-             const link = document.createElement("a");
-             link.href = URL.createObjectURL(blob);
--            const safeName = settings.name.replace(/\s+/g, "_").toLowerCase();
-+            const safeName = TextUtils.sanitizeFileSegment(settings.name);
-             link.download = `${safeName}_invoice-summary.txt`;
-             document.body.appendChild(link);
-             link.click();
-             setTimeout(() => {
-               URL.revokeObjectURL(link.href);
-               link.remove();
-             }, 0);
-             Toast.show("Invoice summary exported.", "success");
-           });
- 
--          const escapeCsvCell = (value) => {
--            const stringValue = String(value ?? "");
--            const leadingWhitespaceMatch = stringValue.match(/^\s*/);
--            const leadingWhitespace = leadingWhitespaceMatch ? leadingWhitespaceMatch[0] : "";
--            const trimmed = stringValue.slice(leadingWhitespace.length);
--            const needsQuotePrefix = /^[=+\-@]/.test(trimmed);
--            const safeValue = needsQuotePrefix ? `${leadingWhitespace}'${trimmed}` : stringValue;
--            const escaped = safeValue.replace(/"/g, '""');
--            return `"${escaped}"`;
--          };
--
-           document.querySelectorAll('[data-export]').forEach((button) => {
-             button.addEventListener("click", () => {
-               const type = button.dataset.export;
-               let records = [];
-               let schema = [];
-               if (type === "bookings") {
-                 records = AppStore.getAllBookings();
-                 schema = ["id", "date", "client", "service", "startTime", "endTime", "status"];
-               } else if (type === "invoices") {
-                 records = AppStore.getInvoices();
-                 schema = ["id", "number", "bookingId", "amount", "status", "dueDate"];
-               } else if (type === "payments") {
-                 records = AppStore.getPayments();
-                 schema = ["id", "date", "client", "amount", "method", "reference"];
-               }
-               const header = schema.join(",");
-               const rows = records.map((record) =>
--                schema.map((key) => escapeCsvCell(record[key])).join(",")
-+                schema.map((key) => TextUtils.escapeCsvCell(record[key])).join(",")
-               );
-               const csv = [header, ...rows].join("\n");
-               const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-               const link = document.createElement("a");
-               link.href = URL.createObjectURL(blob);
--              link.download = `${type}_${DateUtils.todayIso().replaceAll("-", "")}.csv`;
-+              const safeName = TextUtils.sanitizeFileSegment(AppStore.settings.name);
-+              link.download = `${safeName}_${type}_${DateUtils.todayIso().replaceAll("-", "")}.csv`;
-               document.body.appendChild(link);
-               link.click();
-               setTimeout(() => {
-                 URL.revokeObjectURL(link.href);
-                 link.remove();
-               }, 0);
-               Toast.show(`${type.charAt(0).toUpperCase() + type.slice(1)} exported.`, "success");
-             });
-           });
- 
-           const refreshAll = () => {
-             refreshInvoiceOptions();
-             renderInvoices();
-             renderPayments();
-           };
- 
-           return {
-             init() {
-               refreshAll();
-+              resetInvoiceForm();
-+              resetPaymentForm();
-             },
-             refreshInvoiceOptions,
-             renderInvoices,
-             renderPayments,
-             refreshAll,
-             resetInvoiceForm,
-             resetPaymentForm,
-           };
-         })();
- 
-         const Reports = (() => {
-           const canvas = document.getElementById("revenue-chart");
-           const emptyState = document.getElementById("revenue-chart-empty");
-           const highlightsList = document.getElementById("report-highlights");
-           const highlightsEmpty = document.getElementById("report-empty");
-+          const summaryNode = document.getElementById("revenue-chart-summary");
-+
-+          const getAccentColor = () => {
-+            const accent = getComputedStyle(document.documentElement).getPropertyValue("--brand-accent");
-+            return accent ? accent.trim() : defaultState.settings.color;
-+          };
-+
-+          const updateSummary = (dataset) => {
-+            if (!summaryNode) return;
-+            if (dataset.length === 0) {
-+              summaryNode.textContent = "Revenue trend chart with no data yet.";
-+              return;
-+            }
-+            const total = dataset.reduce((sum, item) => sum + item.total, 0);
-+            const first = dataset[0];
-+            const last = dataset[dataset.length - 1];
-+            const average = total / dataset.length;
-+            summaryNode.textContent = `Revenue trend from ${first.label} to ${last.label}. Total $${total.toFixed(
-+              2
-+            )} across ${dataset.length} month${dataset.length === 1 ? "" : "s"} with an average of $${average.toFixed(2)} per month.`;
-+          };
- 
-           const renderChart = (dataset) => {
-             const ctx = canvas.getContext("2d");
-             ctx.clearRect(0, 0, canvas.width, canvas.height);
-             if (dataset.length === 0) {
-               emptyState.classList.remove("hidden");
-+              updateSummary([]);
-               return;
-             }
-             emptyState.classList.add("hidden");
-             const padding = 40;
-             const width = canvas.width - padding * 2;
-             const height = canvas.height - padding * 2;
-             const max = Math.max(...dataset.map((item) => item.total), 1);
-             ctx.strokeStyle = "rgba(148,163,184,0.35)";
-             ctx.beginPath();
-             ctx.moveTo(padding, padding);
-             ctx.lineTo(padding, padding + height);
-             ctx.lineTo(padding + width, padding + height);
-             ctx.stroke();
--            ctx.strokeStyle = "rgba(59,130,246,0.8)";
-+            const accent = getAccentColor();
-+            ctx.strokeStyle = accent || "#a855f7";
-             ctx.lineWidth = 3;
-             ctx.beginPath();
-             dataset.forEach((item, index) => {
-               const x = padding + (index / Math.max(dataset.length - 1, 1)) * width;
-               const y = padding + height - (item.total / max) * height;
-               if (index === 0) ctx.moveTo(x, y);
-               else ctx.lineTo(x, y);
-             });
-             ctx.stroke();
--            ctx.fillStyle = "rgba(59,130,246,1)";
-+            ctx.fillStyle = accent || "#a855f7";
-             dataset.forEach((item, index) => {
-               const x = padding + (index / Math.max(dataset.length - 1, 1)) * width;
-               const y = padding + height - (item.total / max) * height;
-               ctx.beginPath();
-               ctx.arc(x, y, 4, 0, Math.PI * 2);
-               ctx.fill();
-               ctx.fillStyle = "#fff";
-               ctx.font = "12px Inter, sans-serif";
-               ctx.fillText(item.label, x - 20, padding + height + 18);
--              ctx.fillStyle = "rgba(59,130,246,1)";
-+              ctx.fillStyle = accent || "#a855f7";
-             });
-           };
- 
-           const renderHighlights = (dataset) => {
-             highlightsList.innerHTML = "";
-             if (dataset.length === 0) {
-               highlightsEmpty.classList.remove("hidden");
-               return;
-             }
-             highlightsEmpty.classList.add("hidden");
-             const total = dataset.reduce((sum, item) => sum + item.total, 0);
-             const sorted = [...dataset].sort((a, b) => b.total - a.total);
-             const best = sorted[0];
-             const worst = sorted[sorted.length - 1];
-             const entries = [
-               `Total revenue across ${dataset.length} months: $${total.toFixed(2)}`,
-               `Average monthly revenue: $${(total / dataset.length).toFixed(2)}`,
-               `Best month: ${best.label} with $${best.total.toFixed(2)}`,
-               `Lowest month: ${worst.label} with $${worst.total.toFixed(2)}`,
-             ];
-             entries.forEach((entry) => {
-               const li = document.createElement("li");
-               li.textContent = entry;
-               highlightsList.appendChild(li);
-             });
-           };
- 
-           return {
-             render() {
-               const payments = AppStore.getPayments();
-               const grouped = new Map();
-               payments.forEach((payment) => {
-                 const parsed = DateUtils.fromIso(payment.date);
-                 if (!parsed) return;
-                 const key = `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}`;
-                 const label = parsed.toLocaleDateString(undefined, { month: "short", year: "numeric" });
-                 if (!grouped.has(key)) grouped.set(key, { key, label, total: 0 });
-                 grouped.get(key).total += Number(payment.amount || 0);
-               });
-               const dataset = Array.from(grouped.values()).sort((a, b) => a.key.localeCompare(b.key));
-               renderChart(dataset);
-               renderHighlights(dataset);
-+              updateSummary(dataset);
-             },
-           };
-         })();
- 
-         const Settings = (() => {
-           const form = document.getElementById("settings-form");
-           const preview = {
-             name: document.getElementById("brand-preview-name"),
-             email: document.getElementById("brand-preview-email"),
-             phone: document.getElementById("brand-preview-phone"),
-             address: document.getElementById("brand-preview-address"),
-           };
-           const brandingTitle = document.getElementById("branding-title");
- 
-           const applyPreview = (settings) => {
-             brandingTitle.textContent = `${settings.name} Console`;
-             preview.name.textContent = settings.name;
-             preview.email.textContent = settings.email;
-             preview.phone.textContent = settings.phone || "—";
-             preview.address.textContent = settings.address || "—";
--            document.documentElement.style.setProperty("--brand-accent", settings.color || "#3b82f6");
-+            Theme.setAccent(settings.color || defaultState.settings.color);
-           };
- 
-           form.addEventListener("submit", (event) => {
-             event.preventDefault();
-             const data = new FormData(form);
-             const updates = {
-               name: String(data.get("name") || "").trim(),
-               email: String(data.get("email") || "").trim(),
-               phone: String(data.get("phone") || "").trim(),
-               color: data.get("color") || "#3b82f6",
-               address: String(data.get("address") || "").trim(),
-             };
-             if (!updates.name || !updates.email) {
-               Toast.show("Name and email are required for branding.", "error");
-               return;
-             }
-             const updated = AppStore.updateSettings(updates);
-             applyPreview(updated);
-             Reports.render();
-             Toast.show("Brand settings saved.", "success");
-           });
- 
-           return {
-             init() {
-               const settings = AppStore.settings;
-diff --git a/zantra_bookings.html b/zantra_bookings.html
-index 6d1f3d336980ac7f68487860f3cb491ef2c8ceda..121058b2dcbc28e4b0710380bbfb1cc6b10e5563 100644
---- a/zantra_bookings.html
-+++ b/zantra_bookings.html
-@@ -1862,72 +2144,69 @@
-           return {
-             refresh() {
-               const upcoming = AppStore.getUpcomingBookings();
-               const openInvoices = AppStore.getOpenInvoices();
-               const now = new Date();
-               const paymentsThisMonth = AppStore.getPaymentsForMonth(now.getFullYear(), now.getMonth());
-               const totalPayments = paymentsThisMonth.reduce((sum, item) => sum + Number(item.amount || 0), 0);
- 
-               summaryUpcoming.textContent = upcoming.length;
-               summaryOpenInvoices.textContent = openInvoices.length;
-               summaryMonthPayments.textContent = `$${totalPayments.toFixed(2)}`;
- 
-               notificationsList.innerHTML = "";
-               const notifications = [];
- 
-               upcoming.forEach((booking) => {
-                 notifications.push({
-                   tone: "info",
-                   text: `${booking.client} — ${booking.service} on ${DateUtils.display(booking.date)} at ${booking.startTime}`,
-                 });
-               });
- 
-               openInvoices.forEach((invoice) => {
-                 notifications.push({
-                   tone: invoice.status === "overdue" ? "warning" : "info",
--                  text: `${invoice.number || "Invoice"} is ${(invoice.status || "pending").toUpperCase()} and due ${invoice.dueDate || "soon"}`,
-+                  text: `${invoice.number || "Invoice"} is ${(invoice.status || "pending").toUpperCase()} and due ${DateUtils.display(
-+                    invoice.dueDate
-+                  )}`,
-                 });
-               });
- 
-               if (notifications.length === 0) {
-                 emptyState.classList.remove("hidden");
-                 return;
-               }
- 
-               emptyState.classList.add("hidden");
-               notifications.forEach((notification) => {
-                 const item = document.createElement("li");
--                const wrapper = document.createElement("div");
--                wrapper.className = "flex gap-sm";
-+                item.className = "notification-item";
-+                item.dataset.tone = notification.tone;
- 
-                 const dot = document.createElement("span");
--                dot.style.marginTop = "0.35rem";
--                dot.style.width = "0.6rem";
--                dot.style.height = "0.6rem";
--                dot.style.borderRadius = "999px";
--                dot.style.backgroundColor =
--                  notification.tone === "warning" ? "var(--amber-400)" : "var(--blue-400)";
-+                dot.className = `notification-dot ${notification.tone === "warning" ? "warning" : "info"}`;
- 
-                 const text = document.createElement("p");
-                 text.style.margin = "0";
-+                text.className = "text-small";
-                 text.textContent = notification.text;
- 
--                wrapper.append(dot, text);
--                item.appendChild(wrapper);
-+                item.append(dot, text);
-                 notificationsList.appendChild(item);
-               });
-             },
-           };
-         })();
- 
-         document.addEventListener("DOMContentLoaded", () => {
-           Tabs.show("dashboard");
-           Calendar.init();
-           Payments.init();
-           Settings.init();
-           Dashboard.refresh();
-           Reports.render();
-         });
-       })();
-     </script>
-   </body>
- </html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zantra Bookings Console</title>
+    <script>
+      window.tailwind = window.tailwind || {};
+      window.tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                primary: "#4b0082",
+                accent: "#a855f7",
+              },
+            },
+            fontFamily: {
+              sans: [
+                "Inter",
+                "Segoe UI",
+                "system-ui",
+                "-apple-system",
+                "BlinkMacSystemFont",
+                "sans-serif",
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
+          sans-serif;
+        --slate-100: #f8fafc;
+        --slate-950: #020617;
+        --slate-900: #0f172a;
+        --slate-800: #1e293b;
+        --slate-700: #334155;
+        --slate-600: #475569;
+        --slate-500: #64748b;
+        --slate-400: #94a3b8;
+        --slate-300: #cbd5f5;
+        --brand-primary: #4b0082;
+        --brand-primary-soft: #5f1aa6;
+        --brand-primary-rgb: 75, 0, 130;
+        --brand-accent: #a855f7;
+        --brand-accent-rgb: 168, 85, 247;
+        --emerald-400: #34d399;
+        --amber-400: #fbbf24;
+        --white: #ffffff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background-color: var(--slate-950);
+        color: var(--slate-100);
+        min-height: 100vh;
+        font-family: inherit;
+        line-height: 1.6;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        margin: 0;
+      }
+      a,
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+        color: inherit;
+      }
+      button {
+        cursor: pointer;
+        border: none;
+        background: none;
+      }
+      input,
+      select,
+      textarea {
+        background-color: var(--slate-900);
+        border: 1px solid var(--slate-700);
+        color: inherit;
+        border-radius: 0.75rem;
+        padding: 0.5rem 0.75rem;
+      }
+      button:focus,
+      button:focus-visible,
+      input:focus,
+      input:focus-visible,
+      select:focus,
+      select:focus-visible,
+      textarea:focus,
+      textarea:focus-visible {
+        outline: 2px solid var(--brand-accent);
+        outline-offset: 2px;
+      }
+      .app-shell {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 2rem 1.25rem;
+        display: grid;
+        gap: 1.5rem;
+      }
+      .card {
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 25px 60px rgba(2, 6, 23, 0.45);
+        backdrop-filter: blur(12px);
+      }
+      .grid {
+        display: grid;
+        gap: 1.25rem;
+      }
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .gap-sm {
+        gap: 0.75rem;
+      }
+      .gap-md {
+        gap: 1rem;
+      }
+      .gap-lg {
+        gap: 1.5rem;
+      }
+      .mt-1 {
+        margin-top: 0.5rem;
+      }
+      .mt-2 {
+        margin-top: 1rem;
+      }
+      .text-muted {
+        color: var(--slate-400);
+      }
+      .text-subtle {
+        color: var(--slate-500);
+      }
+      .text-small {
+        font-size: 0.9rem;
+      }
+      .text-xs {
+        font-size: 0.75rem;
+      }
+      .text-center {
+        text-align: center;
+      }
+      .flex {
+        display: flex;
+      }
+      .flex-wrap {
+        flex-wrap: wrap;
+      }
+      .items-center {
+        align-items: center;
+      }
+      .items-start {
+        align-items: flex-start;
+      }
+      .justify-between {
+        justify-content: space-between;
+      }
+      .justify-end {
+        justify-content: flex-end;
+      }
+      .list-plain {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 0.75rem;
+      }
+      .btn {
+        border-radius: 0.75rem;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        transition: background 0.2s ease, transform 0.15s ease;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: rgba(15, 23, 42, 0.85);
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+        background: rgba(15, 23, 42, 0.95);
+      }
+      .btn-primary {
+        background: var(--brand-primary);
+        color: var(--white);
+        border: none;
+      }
+      .btn-primary:hover {
+        background: var(--brand-primary-soft);
+      }
+      .btn-ghost {
+        padding: 0.35rem 0.6rem;
+        border-radius: 0.6rem;
+        border: 1px solid transparent;
+        background: transparent;
+      }
+      .btn-ghost:hover {
+        border-color: rgba(148, 163, 184, 0.35);
+        background: rgba(15, 23, 42, 0.6);
+      }
+      .btn-sm {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+      }
+      .app-header {
+        background: linear-gradient(135deg, rgba(var(--brand-primary-rgb), 0.92), rgba(2, 6, 23, 0.92));
+        border: 1px solid rgba(var(--brand-primary-rgb), 0.45);
+      }
+      .header-brand {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .brand-logo {
+        height: 48px;
+        width: auto;
+        flex-shrink: 0;
+        border-radius: 0.5rem;
+        display: block;
+      }
+      .brand-preview {
+        display: grid;
+        gap: 0.35rem;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(var(--brand-accent-rgb), 0.4);
+        background: rgba(15, 23, 42, 0.6);
+      }
+      .brand-preview h4 {
+        color: var(--brand-accent);
+      }
+      .brand-preview-logo {
+        height: 40px;
+        width: auto;
+        margin-bottom: 0.5rem;
+        justify-self: start;
+      }
+      .form-field {
+        display: grid;
+        gap: 0.35rem;
+      }
+      .form-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--slate-300);
+      }
+      .header-actions {
+        display: flex;
+        gap: 0.75rem;
+      }
+      nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 0.75rem;
+        overflow: hidden;
+      }
+      nav li {
+        flex: 1 1 0;
+      }
+      nav button {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        text-align: center;
+        font-weight: 600;
+        background: rgba(15, 23, 42, 0.6);
+        transition: background 0.2s ease;
+      }
+      nav button:hover {
+        background: rgba(var(--brand-primary-rgb), 0.12);
+      }
+      nav button.active {
+        background: rgba(var(--brand-primary-rgb), 0.15);
+        color: var(--slate-100);
+      }
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 0.5rem;
+      }
+      .calendar-cell {
+        position: relative;
+        min-height: 96px;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        background: rgba(2, 6, 23, 0.85);
+        padding: 0.75rem;
+        text-align: left;
+        display: grid;
+        gap: 0.35rem;
+        align-content: start;
+      }
+      .calendar-cell.active {
+        border-color: var(--brand-accent);
+        background: rgba(var(--brand-accent-rgb), 0.18);
+      }
+      .badge {
+        padding: 0.2rem 0.5rem;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+      .badge-confirmed {
+        background: rgba(16, 185, 129, 0.12);
+        color: var(--emerald-400);
+      }
+      .badge-pending {
+        background: rgba(251, 191, 36, 0.12);
+        color: var(--amber-400);
+      }
+      .badge-default {
+        background: rgba(148, 163, 184, 0.12);
+        color: var(--slate-300);
+      }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      .table thead {
+        color: var(--slate-400);
+        font-weight: 600;
+      }
+      .table th,
+      .table td {
+        padding: 0.6rem 0.5rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+        vertical-align: top;
+      }
+      .table-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+      }
+      .empty {
+        color: var(--slate-500);
+        font-size: 0.9rem;
+      }
+      .toast-region {
+        position: fixed;
+        top: 1.25rem;
+        right: 1.25rem;
+        display: grid;
+        gap: 0.75rem;
+        z-index: 1000;
+        pointer-events: none;
+      }
+      .toast {
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 0.9rem;
+        padding: 0.85rem 1rem;
+        box-shadow: 0 20px 45px rgba(2, 6, 23, 0.5);
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        pointer-events: auto;
+      }
+      .toast.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .toast[data-tone="success"] {
+        border-color: rgba(16, 185, 129, 0.5);
+      }
+      .toast[data-tone="error"] {
+        border-color: rgba(244, 63, 94, 0.5);
+      }
+      .toast[data-tone="warning"] {
+        border-color: rgba(251, 191, 36, 0.5);
+      }
+      .toast[data-tone="info"] {
+        border-color: rgba(var(--brand-accent-rgb), 0.5);
+      }
+      .notification-item {
+        display: flex;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        background: rgba(15, 23, 42, 0.65);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        align-items: flex-start;
+      }
+      .notification-item[data-tone="info"] {
+        border-left: 4px solid var(--brand-accent);
+      }
+      .notification-item[data-tone="warning"] {
+        border-left: 4px solid var(--amber-400);
+      }
+      .notification-dot {
+        margin-top: 0.2rem;
+        width: 0.6rem;
+        height: 0.6rem;
+        border-radius: 999px;
+        flex-shrink: 0;
+      }
+      .notification-dot.info {
+        background-color: var(--brand-accent);
+      }
+      .notification-dot.warning {
+        background-color: var(--amber-400);
+      }
+      .visually-hidden {
+        position: absolute !important;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+        clip: rect(1px, 1px, 1px, 1px);
+        white-space: nowrap;
+      }
+      .hidden {
+        display: none !important;
+      }
+      @media (max-width: 600px) {
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr !important;
+        }
+        nav ul {
+          flex-direction: column;
+        }
+        .header-actions {
+          justify-content: flex-start;
+        }
+      }
+      @media (min-width: 900px) {
+        .grid-2 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .grid-3 {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="toast-region"
+      class="toast-region"
+      aria-live="assertive"
+      aria-atomic="true"
+    ></div>
+    <div class="app-shell" id="app">
+      <header class="card app-header">
+        <div class="grid grid-2 gap-md items-start">
+          <div class="header-brand">
+            <img
+              src="Zantra_Bookings_Logo.png"
+              alt="Zantra Bookings Logo"
+              class="brand-logo"
+            />
+            <div>
+              <h1 id="branding-title">Zantra Bookings Suite</h1>
+              <p class="text-muted mt-1">
+                Manage bookings, invoices, and brand preferences from a single enterprise-ready
+                console.
+              </p>
+            </div>
+          </div>
+          <div class="header-actions flex justify-end items-start flex-wrap">
+            <button id="quick-add-booking" class="btn btn-primary" type="button">
+              Quick Add Booking
+            </button>
+            <button id="quick-add-payment" class="btn" type="button">Record Payment</button>
+          </div>
+        </div>
+      </header>
+
+      <nav role="tablist" aria-label="Primary sections">
+        <ul>
+          <li>
+            <button
+              class="tab-button active"
+              data-tab="dashboard"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="tab-dashboard"
+              tabindex="0"
+            >
+              Dashboard
+            </button>
+          </li>
+          <li>
+            <button
+              class="tab-button"
+              data-tab="bookings"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="tab-bookings"
+              tabindex="-1"
+            >
+              Calendar &amp; Bookings
+            </button>
+          </li>
+          <li>
+            <button
+              class="tab-button"
+              data-tab="payments"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="tab-payments"
+              tabindex="-1"
+            >
+              Payments &amp; Invoicing
+            </button>
+          </li>
+          <li>
+            <button
+              class="tab-button"
+              data-tab="reports"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="tab-reports"
+              tabindex="-1"
+            >
+              Reports &amp; Exports
+            </button>
+          </li>
+          <li>
+            <button
+              class="tab-button"
+              data-tab="settings"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="tab-settings"
+              tabindex="-1"
+            >
+              Settings &amp; Branding
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <main class="grid gap-lg">
+        <section id="tab-dashboard" class="tab-panel">
+          <div class="grid grid-3 gap-md">
+            <div class="card">
+              <h2>At a Glance</h2>
+              <dl class="list-plain mt-2">
+                <div class="flex justify-between">
+                  <dt class="text-muted text-small">Upcoming bookings</dt>
+                  <dd id="summary-upcoming">0</dd>
+                </div>
+                <div class="flex justify-between">
+                  <dt class="text-muted text-small">Open invoices</dt>
+                  <dd id="summary-open-invoices">0</dd>
+                </div>
+                <div class="flex justify-between">
+                  <dt class="text-muted text-small">Payments this month</dt>
+                  <dd id="summary-month-payments">$0.00</dd>
+                </div>
+              </dl>
+            </div>
+            <div class="card col-span-1 lg:col-span-2">
+              <h2>Notifications</h2>
+              <ul id="dashboard-notifications" class="list-plain mt-2"></ul>
+              <p id="dashboard-empty-state" class="empty mt-1">
+                No new notifications. All systems operating smoothly.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-bookings" class="tab-panel hidden">
+          <div class="grid grid-2 gap-md">
+            <div class="card">
+              <div class="grid grid-2 gap-sm items-center">
+                <div>
+                  <h2>Booking Calendar</h2>
+                  <p class="text-muted text-small mt-1">
+                    Select a day to review or add client sessions.
+                  </p>
+                </div>
+                <div class="flex gap-sm justify-end items-center">
+                  <button id="calendar-prev" class="btn btn-ghost" type="button" aria-label="Previous month">
+                    Prev
+                  </button>
+                  <span id="calendar-month"></span>
+                  <button id="calendar-next" class="btn btn-ghost" type="button" aria-label="Next month">
+                    Next
+                  </button>
+                </div>
+              </div>
+              <div class="calendar-grid mt-1 text-subtle text-small" aria-label="Calendar weekdays">
+                <div class="text-center">Sun</div>
+                <div class="text-center">Mon</div>
+                <div class="text-center">Tue</div>
+                <div class="text-center">Wed</div>
+                <div class="text-center">Thu</div>
+                <div class="text-center">Fri</div>
+                <div class="text-center">Sat</div>
+              </div>
+              <div id="calendar-grid" class="calendar-grid mt-1" aria-live="polite"></div>
+            </div>
+
+            <div class="card grid gap-md">
+              <div>
+                <h3>Bookings on <span id="selected-date-label">Select a date</span></h3>
+                <ul id="booking-list" class="list-plain mt-2"></ul>
+                <p id="booking-empty" class="empty mt-1">No bookings scheduled yet.</p>
+              </div>
+              <form
+                id="booking-form"
+                class="grid gap-sm"
+                autocomplete="off"
+                aria-labelledby="booking-form-title"
+              >
+                <div class="flex justify-between items-center">
+                  <h4 id="booking-form-title">Add booking</h4>
+                  <button
+                    id="booking-cancel-edit"
+                    type="button"
+                    class="btn btn-ghost btn-sm hidden"
+                  >
+                    Cancel edit
+                  </button>
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="booking-client">Client name</label>
+                  <input
+                    id="booking-client"
+                    type="text"
+                    name="client"
+                    required
+                    placeholder="Client name"
+                  />
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="booking-service">Service</label>
+                  <input
+                    id="booking-service"
+                    type="text"
+                    name="service"
+                    required
+                    placeholder="Service description"
+                  />
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="booking-start">Start time</label>
+                  <input id="booking-start" type="time" name="startTime" required />
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="booking-end">End time</label>
+                  <input id="booking-end" type="time" name="endTime" required />
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="booking-status">Status</label>
+                  <select id="booking-status" name="status">
+                    <option value="confirmed">Confirmed</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Save booking</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-payments" class="tab-panel hidden">
+          <div class="grid grid-2 gap-md">
+            <div class="card">
+              <div class="flex justify-between items-center">
+                <h2>Invoices</h2>
+                <button id="generate-invoice" class="btn btn-primary" type="button">
+                  Generate PDF Invoice
+                </button>
+              </div>
+              <table class="table mt-2" aria-label="Invoices table">
+                <thead>
+                  <tr>
+                    <th scope="col">Invoice #</th>
+                    <th scope="col">Booking</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Due date</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="invoice-table"></tbody>
+              </table>
+              <p id="invoice-empty" class="empty mt-1">No invoices available. Create one from a booking.</p>
+            </div>
+
+            <div class="card">
+              <h2>Payments</h2>
+              <table class="table mt-2" aria-label="Payments table">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Client</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Method</th>
+                    <th scope="col">Reference</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="payments-table"></tbody>
+              </table>
+              <p id="payments-empty" class="empty mt-1">No payments recorded yet.</p>
+            </div>
+
+            <div class="card">
+              <h3 id="invoice-form-title">Create invoice</h3>
+              <form
+                id="invoice-form"
+                class="grid gap-sm mt-1"
+                autocomplete="off"
+                aria-labelledby="invoice-form-title"
+              >
+                <div class="flex justify-between items-center gap-sm">
+                  <div class="form-field flex-1">
+                    <label class="form-label" for="invoice-booking">Booking</label>
+                    <select id="invoice-booking" name="bookingId" required></select>
+                  </div>
+                  <button
+                    id="invoice-cancel-edit"
+                    type="button"
+                    class="btn btn-ghost btn-sm hidden"
+                  >
+                    Cancel edit
+                  </button>
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="invoice-amount">Amount</label>
+                  <input
+                    id="invoice-amount"
+                    type="number"
+                    name="amount"
+                    step="0.01"
+                    min="0"
+                    required
+                    placeholder="0.00"
+                  />
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="invoice-due">Due date</label>
+                  <input id="invoice-due" type="date" name="dueDate" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Save invoice</button>
+              </form>
+            </div>
+
+            <div class="card">
+              <h3 id="payment-form-title">Record payment</h3>
+              <form
+                id="payment-form"
+                class="grid gap-sm mt-1"
+                autocomplete="off"
+                aria-labelledby="payment-form-title"
+              >
+                <div class="flex justify-between items-center gap-sm">
+                  <div class="form-field flex-1">
+                    <label class="form-label" for="payment-client">Client</label>
+                    <input
+                      id="payment-client"
+                      type="text"
+                      name="client"
+                      required
+                      placeholder="Client name"
+                    />
+                  </div>
+                  <button
+                    id="payment-cancel-edit"
+                    type="button"
+                    class="btn btn-ghost btn-sm hidden"
+                  >
+                    Cancel edit
+                  </button>
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="payment-date">Payment date</label>
+                  <input id="payment-date" type="date" name="date" required />
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="payment-amount">Amount</label>
+                  <input
+                    id="payment-amount"
+                    type="number"
+                    name="amount"
+                    step="0.01"
+                    min="0"
+                    required
+                    placeholder="0.00"
+                  />
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="payment-method">Method</label>
+                  <select id="payment-method" name="method">
+                    <option value="Card">Card</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Transfer">Transfer</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="payment-reference">Reference</label>
+                  <input
+                    id="payment-reference"
+                    type="text"
+                    name="reference"
+                    placeholder="Optional reference"
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary">Save payment</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-reports" class="tab-panel hidden">
+          <div class="grid grid-2 gap-md">
+            <div class="card">
+              <h2>Revenue trend</h2>
+              <canvas
+                id="revenue-chart"
+                class="mt-2"
+                width="640"
+                height="320"
+                role="img"
+                aria-label="Revenue trend chart"
+                aria-describedby="revenue-chart-summary report-highlights"
+              ></canvas>
+              <p id="revenue-chart-summary" class="visually-hidden">
+                Revenue trend chart with no data yet.
+              </p>
+              <p id="revenue-chart-empty" class="empty mt-1">
+                Add payments to generate the revenue chart.
+              </p>
+            </div>
+            <div class="card">
+              <h2>Highlights</h2>
+              <ul id="report-highlights" class="list-plain mt-2"></ul>
+              <p id="report-empty" class="empty mt-1">
+                When payments are logged the highlights will appear here.
+              </p>
+            </div>
+          </div>
+          <div class="card flex flex-wrap gap-sm mt-2">
+            <button class="btn" data-export="bookings" type="button">Export bookings CSV</button>
+            <button class="btn" data-export="invoices" type="button">Export invoices CSV</button>
+            <button class="btn" data-export="payments" type="button">Export payments CSV</button>
+          </div>
+        </section>
+
+        <section id="tab-settings" class="tab-panel hidden">
+          <div class="grid grid-2 gap-md">
+            <div class="card">
+              <h2 id="settings-form-title">Brand identity</h2>
+              <form
+                id="settings-form"
+                class="grid gap-sm mt-1"
+                autocomplete="off"
+                aria-labelledby="settings-form-title"
+              >
+                <div class="form-field">
+                  <label class="form-label" for="settings-name">Business name</label>
+                  <input id="settings-name" type="text" name="name" required />
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="settings-email">Support email</label>
+                  <input id="settings-email" type="email" name="email" required />
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="settings-phone">Phone</label>
+                  <input id="settings-phone" type="text" name="phone" />
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="settings-color">Accent color</label>
+                  <input id="settings-color" type="color" name="color" />
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="settings-address">Address</label>
+                  <textarea id="settings-address" name="address" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Update branding</button>
+              </form>
+            </div>
+            <div class="card">
+              <h3>Brand preview</h3>
+              <div id="brand-preview" class="brand-preview mt-1">
+                <img
+                  src="Zantra_Bookings_Logo.png"
+                  alt="Zantra Bookings Logo"
+                  class="brand-logo brand-preview-logo"
+                />
+                <h4 id="brand-preview-name" class="text-[1.35rem] font-semibold">Zantra Studios</h4>
+                <p id="brand-preview-email" class="text-muted">team@zantra.com</p>
+                <p id="brand-preview-phone" class="text-muted">+1 (555) 123-4567</p>
+                <p id="brand-preview-address" class="text-small text-muted mt-1">
+                  123 Market Street, Suite 400, San Francisco, CA
+                </p>
+              </div>
+              <div class="text-muted text-small mt-2">
+                <p class="mt-0">Tips:</p>
+                <ul class="mt-1 ml-5 list-disc space-y-1">
+                  <li>Keep the accent colour aligned with your design system.</li>
+                  <li>Ensure support details stay current for invoices.</li>
+                  <li>Update settings before exporting PDFs to refresh branding.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script id="core.js">
+      (function () {
+        "use strict";
+
+        const safeClone = globalThis.structuredClone ?? ((obj) =>
+          JSON.parse(JSON.stringify(obj))
+        );
+
+        const DateUtils = (() => {
+          const pad = (value) => String(value).padStart(2, "0");
+          const toIso = (date) => {
+            if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+          };
+          const fromIso = (value) => {
+            if (typeof value !== "string") return null;
+            const parts = value.split("-");
+            if (parts.length !== 3) return null;
+            const [yearStr, monthStr, dayStr] = parts;
+            const year = Number(yearStr);
+            const monthIndex = Number(monthStr) - 1;
+            const day = Number(dayStr);
+            if (
+              !Number.isInteger(year) ||
+              !Number.isInteger(monthIndex) ||
+              !Number.isInteger(day)
+            ) {
+              return null;
+            }
+            const candidate = new Date(year, monthIndex, day);
+            if (
+              candidate.getFullYear() !== year ||
+              candidate.getMonth() !== monthIndex ||
+              candidate.getDate() !== day
+            ) {
+              return null;
+            }
+            return candidate;
+          };
+          const todayIso = () => toIso(new Date());
+          const display = (isoString) => {
+            const parsed = fromIso(isoString);
+            if (!parsed) return "—";
+            return parsed.toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            });
+          };
+          return { toIso, fromIso, todayIso, display };
+        })();
+
+        const TextUtils = (() => {
+          const FALLBACK = "zantra";
+          const sanitizeFileSegment = (value, fallback = FALLBACK) => {
+            const lower = String(value ?? "").toLowerCase();
+            const sanitized = lower
+              .replace(/[^a-z0-9_-]+/g, "-")
+              .replace(/-+/g, "-")
+              .replace(/^[-_]+|[-_]+$/g, "");
+            return sanitized || fallback;
+          };
+          const escapeCsvCell = (value) => {
+            const stringValue = String(value ?? "");
+            const cleaned = stringValue.replace(/\r\n|\n|\r/g, " ");
+            const leadingWhitespaceMatch = cleaned.match(/^\s*/);
+            const leadingWhitespace = leadingWhitespaceMatch ? leadingWhitespaceMatch[0] : "";
+            const trimmed = cleaned.slice(leadingWhitespace.length);
+            const needsQuotePrefix = /^[=+\-@]/.test(trimmed);
+            const safeValue = needsQuotePrefix ? `${leadingWhitespace}'${trimmed}` : cleaned;
+            const escaped = safeValue.replace(/"/g, '""');
+            return `"${escaped}"`;
+          };
+          return { sanitizeFileSegment, escapeCsvCell };
+        })();
+
+        const Toast = (() => {
+          const region = document.getElementById("toast-region");
+          const timers = new WeakMap();
+          const maxVisible = 4;
+
+          const removeToast = (toast) => {
+            if (!toast) return;
+            const existing = timers.get(toast);
+            if (existing?.hideTimer) window.clearTimeout(existing.hideTimer);
+            if (existing?.removeTimer) window.clearTimeout(existing.removeTimer);
+            toast.classList.remove("visible");
+            const removeTimer = window.setTimeout(() => {
+              toast.remove();
+              timers.delete(toast);
+            }, 250);
+            timers.set(toast, { hideTimer: null, removeTimer });
+          };
+
+          const queueRemoval = (toast, duration) => {
+            const hideTimer = window.setTimeout(() => removeToast(toast), Math.max(duration, 1600));
+            timers.set(toast, { hideTimer, removeTimer: null });
+          };
+
+          const show = (message, tone = "info", options = {}) => {
+            if (!region || !message) return;
+            const toast = document.createElement("div");
+            toast.className = "toast";
+            toast.dataset.tone = tone;
+            toast.setAttribute("role", "alert");
+            toast.textContent = message;
+            if (region.children.length >= maxVisible) {
+              removeToast(region.firstElementChild);
+            }
+            region.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add("visible"));
+            const duration = Number.isFinite(options.duration) ? options.duration : 4000;
+            queueRemoval(toast, duration);
+            toast.addEventListener("click", () => removeToast(toast));
+          };
+
+          return { show };
+        })();
+
+        const Theme = (() => {
+          const FALLBACK = "#a855f7";
+          const normalize = (value) => {
+            if (typeof value !== "string") return FALLBACK;
+            const trimmed = value.trim();
+            if (!/^#?[0-9a-f]{3,6}$/i.test(trimmed)) return FALLBACK;
+            let hex = trimmed.startsWith("#") ? trimmed.slice(1) : trimmed;
+            if (hex.length === 3) {
+              hex = hex
+                .split("")
+                .map((char) => char + char)
+                .join("");
+            }
+            return `#${hex.slice(0, 6)}`;
+          };
+          const hexToRgb = (hex) => {
+            if (!/^#[0-9a-f]{6}$/i.test(hex)) return null;
+            const value = hex.slice(1);
+            const bigint = parseInt(value, 16);
+            return [
+              (bigint >> 16) & 255,
+              (bigint >> 8) & 255,
+              bigint & 255,
+            ];
+          };
+          const setAccent = (value) => {
+            const normalized = normalize(value);
+            document.documentElement.style.setProperty("--brand-accent", normalized);
+            const rgb = hexToRgb(normalized);
+            if (rgb) {
+              document.documentElement.style.setProperty("--brand-accent-rgb", rgb.join(", "));
+            }
+          };
+          setAccent(FALLBACK);
+          return { setAccent };
+        })();
+
+        window.ZantraCore = Object.freeze({
+          safeClone,
+          DateUtils,
+          TextUtils,
+          Toast,
+          Theme,
+        });
+      })();
+    </script>
+    <script>
+      (function () {
+        "use strict";
+
+        const core = window.ZantraCore;
+        if (!core) {
+          throw new Error("Zantra core utilities failed to load.");
+        }
+        const { safeClone, DateUtils, TextUtils, Toast, Theme } = core;
+
+        const STORAGE_KEY = "zantra_bookings_v2";
+        const defaultState = {
+          bookings: [],
+          invoices: [],
+          payments: [],
+          settings: {
+            name: "Zantra Studios",
+            email: "team@zantra.com",
+            phone: "+1 (555) 123-4567",
+            color: "#a855f7",
+            address: "123 Market Street, Suite 400, San Francisco, CA",
+          },
+        };
+
+        const AppStore = (() => {
+          let state = load();
+          Theme.setAccent(state.settings.color || defaultState.settings.color);
+
+          function load() {
+            try {
+              const raw = localStorage.getItem(STORAGE_KEY);
+              if (!raw) return safeClone(defaultState);
+              const parsed = JSON.parse(raw);
+              return {
+                bookings: Array.isArray(parsed.bookings) ? parsed.bookings : [],
+                invoices: Array.isArray(parsed.invoices) ? parsed.invoices : [],
+                payments: Array.isArray(parsed.payments) ? parsed.payments : [],
+                settings: Object.assign({}, defaultState.settings, parsed.settings || {}),
+              };
+            } catch (error) {
+              console.error("Failed to load persisted data", error);
+              Toast.show("Could not load saved data. Using defaults.", "warning");
+              return safeClone(defaultState);
+            }
+          }
+
+          function persist() {
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (error) {
+              console.error("Failed to persist data", error);
+              if (
+                error &&
+                (error.name === "QuotaExceededError" ||
+                  error.name === "NS_ERROR_DOM_QUOTA_REACHED" ||
+                  error.code === 22)
+              ) {
+                Toast.show("Storage limit reached. Recent changes may not be saved.", "error");
+              }
+            }
+          }
+
+          const randomId = (prefix) => {
+            const id =
+              typeof crypto !== "undefined" && crypto.randomUUID
+                ? crypto.randomUUID()
+                : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+            return `${prefix}_${id}`;
+          };
+
+          const startOfToday = () => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return today;
+          };
+
+          return {
+            get settings() {
+              return safeClone(state.settings);
+            },
+            updateSettings(updates) {
+              state.settings = Object.assign({}, state.settings, updates);
+              persist();
+              return safeClone(state.settings);
+            },
+            addBooking(booking) {
+              const entry = Object.assign({ id: randomId("booking") }, booking);
+              state.bookings.push(entry);
+              persist();
+              return safeClone(entry);
+            },
+            updateBooking(id, updates) {
+              const index = state.bookings.findIndex((item) => item.id === id);
+              if (index === -1) return null;
+              state.bookings[index] = Object.assign({}, state.bookings[index], updates);
+              persist();
+              return safeClone(state.bookings[index]);
+            },
+            removeBooking(id) {
+              const before = state.bookings.length;
+              state.bookings = state.bookings.filter((item) => item.id !== id);
+              if (before === state.bookings.length) return false;
+              state.invoices = state.invoices.filter((invoice) => invoice.bookingId !== id);
+              persist();
+              return true;
+            },
+            getBookingsByDate(iso) {
+              return state.bookings
+                .filter((item) => item.date === iso)
+                .map((item) => safeClone(item));
+            },
+            getAllBookings() {
+              return safeClone(state.bookings);
+            },
+            getBookingById(id) {
+              const found = state.bookings.find((item) => item.id === id);
+              return found ? safeClone(found) : null;
+            },
+            getUpcomingBookings() {
+              const today = startOfToday();
+              return state.bookings
+                .filter((item) => {
+                  const parsed = DateUtils.fromIso(item.date);
+                  if (!parsed) return false;
+                  parsed.setHours(0, 0, 0, 0);
+                  return parsed.getTime() >= today.getTime();
+                })
+                .sort((a, b) => {
+                  const dateA = DateUtils.fromIso(a.date);
+                  const dateB = DateUtils.fromIso(b.date);
+                  if (dateA && dateB) {
+                    const diff = dateA.getTime() - dateB.getTime();
+                    if (diff !== 0) return diff;
+                  } else if (dateA) {
+                    return -1;
+                  } else if (dateB) {
+                    return 1;
+                  }
+                  return a.startTime.localeCompare(b.startTime);
+                })
+                .slice(0, 5)
+                .map((item) => safeClone(item));
+            },
+            addInvoice(invoice) {
+              const entry = Object.assign({ id: randomId("invoice") }, invoice);
+              state.invoices.push(entry);
+              persist();
+              return safeClone(entry);
+            },
+            updateInvoice(id, updates) {
+              const index = state.invoices.findIndex((item) => item.id === id);
+              if (index === -1) return null;
+              state.invoices[index] = Object.assign({}, state.invoices[index], updates);
+              persist();
+              return safeClone(state.invoices[index]);
+            },
+            updateInvoiceStatus(id, status) {
+              return this.updateInvoice(id, { status });
+            },
+            removeInvoice(id) {
+              const before = state.invoices.length;
+              state.invoices = state.invoices.filter((item) => item.id !== id);
+              if (before === state.invoices.length) return false;
+              persist();
+              return true;
+            },
+            getInvoices() {
+              return safeClone(state.invoices);
+            },
+            getInvoiceById(id) {
+              const found = state.invoices.find((item) => item.id === id);
+              return found ? safeClone(found) : null;
+            },
+            getOpenInvoices() {
+              return state.invoices
+                .filter((invoice) => invoice.status !== "paid")
+                .map((invoice) => safeClone(invoice));
+            },
+            addPayment(payment) {
+              const entry = Object.assign({ id: randomId("payment") }, payment);
+              state.payments.push(entry);
+              persist();
+              return safeClone(entry);
+            },
+            updatePayment(id, updates) {
+              const index = state.payments.findIndex((item) => item.id === id);
+              if (index === -1) return null;
+              state.payments[index] = Object.assign({}, state.payments[index], updates);
+              persist();
+              return safeClone(state.payments[index]);
+            },
+            removePayment(id) {
+              const before = state.payments.length;
+              state.payments = state.payments.filter((item) => item.id !== id);
+              if (before === state.payments.length) return false;
+              persist();
+              return true;
+            },
+            getPayments() {
+              return safeClone(state.payments);
+            },
+            getPaymentById(id) {
+              const found = state.payments.find((item) => item.id === id);
+              return found ? safeClone(found) : null;
+            },
+            getPaymentsForMonth(year, monthIndex) {
+              return state.payments
+                .filter((payment) => {
+                  const parsed = DateUtils.fromIso(payment.date);
+                  return parsed && parsed.getFullYear() === year && parsed.getMonth() === monthIndex;
+                })
+                .map((item) => safeClone(item));
+            },
+          };
+        })();
+
+        const Tabs = (() => {
+          const buttons = Array.from(document.querySelectorAll(".tab-button"));
+          const panels = Array.from(document.querySelectorAll(".tab-panel"));
+
+          const show = (name) => {
+            buttons.forEach((button) => {
+              const isActive = button.dataset.tab === name;
+              button.classList.toggle("active", isActive);
+              button.setAttribute("aria-selected", String(isActive));
+              button.tabIndex = isActive ? 0 : -1;
+            });
+            panels.forEach((panel) => {
+              panel.classList.toggle("hidden", panel.id !== `tab-${name}`);
+            });
+          };
+
+          buttons.forEach((button) =>
+            button.addEventListener("click", () => show(button.dataset.tab))
+          );
+
+          return { show };
+        })();
+
+        const Calendar = (() => {
+          const grid = document.getElementById("calendar-grid");
+          const monthLabel = document.getElementById("calendar-month");
+          const selectedLabel = document.getElementById("selected-date-label");
+          const bookingList = document.getElementById("booking-list");
+          const bookingEmpty = document.getElementById("booking-empty");
+          const prevBtn = document.getElementById("calendar-prev");
+          const nextBtn = document.getElementById("calendar-next");
+          const form = document.getElementById("booking-form");
+          const cancelEditBtn = document.getElementById("booking-cancel-edit");
+          const submitBtn = form.querySelector('button[type="submit"]');
+
+          let activeDate = new Date();
+          let selectedIso = null;
+          let editingId = null;
+
+          const setDefaultBookingTimes = (force = false) => {
+            if (!selectedIso || editingId) return;
+            const startField = document.getElementById("booking-start");
+            const endField = document.getElementById("booking-end");
+            if (!startField || !endField) return;
+            const selectedDate = DateUtils.fromIso(selectedIso) || new Date();
+            const slot = new Date();
+            slot.setFullYear(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+            slot.setSeconds(0, 0);
+            const minutes = slot.getMinutes();
+            const remainder = minutes % 30;
+            if (remainder !== 0) {
+              slot.setMinutes(minutes + (30 - remainder));
+            }
+            const start = new Date(slot);
+            const end = new Date(start.getTime() + 60 * 60 * 1000);
+            const format = (date) =>
+              `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+            if (force || !startField.value) startField.value = format(start);
+            if (force || !endField.value) endField.value = format(end);
+          };
+
+          const renderCalendar = () => {
+            const year = activeDate.getFullYear();
+            const month = activeDate.getMonth();
+            const first = new Date(year, month, 1);
+            const last = new Date(year, month + 1, 0);
+
+            monthLabel.textContent = activeDate.toLocaleDateString(undefined, {
+              month: "long",
+              year: "numeric",
+            });
+
+            grid.innerHTML = "";
+            for (let i = 0; i < first.getDay(); i += 1) {
+              const placeholder = document.createElement("div");
+              placeholder.setAttribute("aria-hidden", "true");
+              grid.appendChild(placeholder);
+            }
+
+            for (let day = 1; day <= last.getDate(); day += 1) {
+              const current = new Date(year, month, day);
+              const iso = DateUtils.toIso(current);
+              const cell = document.createElement("button");
+              cell.type = "button";
+              cell.className = "calendar-cell";
+              cell.setAttribute("aria-label", `${current.toDateString()}`);
+              if (iso === selectedIso) cell.classList.add("active");
+              const strong = document.createElement("strong");
+              strong.textContent = String(day);
+              const count = document.createElement("span");
+              count.className = "text-subtle text-xs";
+              const bookingsCount = AppStore.getBookingsByDate(iso).length;
+              count.textContent = `${bookingsCount} booking${bookingsCount === 1 ? "" : "s"}`;
+              cell.append(strong, count);
+              cell.addEventListener("click", () => selectDate(iso));
+              grid.appendChild(cell);
+            }
+          };
+
+          const resetFormState = () => {
+            editingId = null;
+            form.reset();
+            submitBtn.textContent = "Save booking";
+            cancelEditBtn.classList.add("hidden");
+            form.removeAttribute("data-editing-id");
+            setDefaultBookingTimes(true);
+          };
+
+          const renderBookings = () => {
+            bookingList.innerHTML = "";
+            if (!selectedIso) {
+              bookingEmpty.classList.remove("hidden");
+              return;
+            }
+            const bookings = AppStore.getBookingsByDate(selectedIso).sort((a, b) =>
+              a.startTime.localeCompare(b.startTime)
+            );
+            if (bookings.length === 0) {
+              bookingEmpty.classList.remove("hidden");
+              return;
+            }
+            bookingEmpty.classList.add("hidden");
+            bookings.forEach((booking) => {
+              const item = document.createElement("li");
+              const headerRow = document.createElement("div");
+              headerRow.className = "flex justify-between items-center";
+
+              const client = document.createElement("span");
+              client.textContent = booking.client;
+              client.classList.add("font-semibold");
+
+              const badge = document.createElement("span");
+              badge.className =
+                booking.status === "confirmed"
+                  ? "badge badge-confirmed"
+                  : booking.status === "pending"
+                  ? "badge badge-pending"
+                  : "badge badge-default";
+              badge.textContent = booking.status;
+
+              headerRow.append(client, badge);
+
+              const service = document.createElement("div");
+              service.className = "text-muted text-small";
+              service.textContent = booking.service;
+
+              const timing = document.createElement("div");
+              timing.className = "text-subtle text-xs";
+              timing.textContent = `${DateUtils.display(booking.date)} • ${booking.startTime} - ${booking.endTime}`;
+
+              const actions = document.createElement("div");
+              actions.className = "table-actions";
+
+              const editBtn = document.createElement("button");
+              editBtn.type = "button";
+              editBtn.className = "btn btn-ghost btn-sm";
+              editBtn.textContent = "Edit";
+              editBtn.addEventListener("click", () => {
+                editingId = booking.id;
+                form.dataset.editingId = booking.id;
+                submitBtn.textContent = "Update booking";
+                cancelEditBtn.classList.remove("hidden");
+                form.client.value = booking.client;
+                form.service.value = booking.service;
+                form.startTime.value = booking.startTime;
+                form.endTime.value = booking.endTime;
+                form.status.value = booking.status;
+                document.getElementById("booking-client").focus();
+              });
+
+              const deleteBtn = document.createElement("button");
+              deleteBtn.type = "button";
+              deleteBtn.className = "btn btn-ghost btn-sm";
+              deleteBtn.textContent = "Delete";
+              deleteBtn.addEventListener("click", () => {
+                if (!AppStore.removeBooking(booking.id)) return;
+                if (editingId === booking.id) {
+                  resetFormState();
+                }
+                renderCalendar();
+                renderBookings();
+                Dashboard.refresh();
+                Payments.refreshAll();
+                Reports.render();
+                Toast.show("Booking removed.", "success");
+              });
+
+              actions.append(editBtn, deleteBtn);
+
+              item.append(headerRow, service, timing, actions);
+              bookingList.appendChild(item);
+            });
+          };
+
+          const selectDate = (iso) => {
+            selectedIso = iso;
+            selectedLabel.textContent = DateUtils.display(iso);
+            if (editingId) {
+              const editingBooking = AppStore.getBookingById(editingId);
+              if (!editingBooking || editingBooking.date !== iso) {
+                resetFormState();
+              }
+            }
+            renderCalendar();
+            renderBookings();
+            setDefaultBookingTimes();
+          };
+
+          form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            if (!selectedIso) {
+              Toast.show("Select a date on the calendar before adding a booking.", "error");
+              return;
+            }
+            const formData = new FormData(form);
+            const client = String(formData.get("client") || "").trim();
+            const service = String(formData.get("service") || "").trim();
+            const startTime = String(formData.get("startTime") || "").trim();
+            const endTime = String(formData.get("endTime") || "").trim();
+            const status = String(formData.get("status") || "confirmed");
+            if (!client || !service) {
+              Toast.show("Client and service are required.", "error");
+              return;
+            }
+            if (endTime <= startTime) {
+              Toast.show("End time must be after start time.", "error");
+              return;
+            }
+            if (editingId) {
+              AppStore.updateBooking(editingId, {
+                client,
+                service,
+                startTime,
+                endTime,
+                status,
+                date: selectedIso,
+              });
+              Toast.show(`Booking updated for ${DateUtils.display(selectedIso)}.`, "success");
+            } else {
+              AppStore.addBooking({
+                date: selectedIso,
+                client,
+                service,
+                startTime,
+                endTime,
+                status,
+              });
+              Toast.show(`Booking added for ${DateUtils.display(selectedIso)}.`, "success");
+            }
+            resetFormState();
+            renderCalendar();
+            renderBookings();
+            Dashboard.refresh();
+            Payments.refreshAll();
+            Reports.render();
+          });
+
+          cancelEditBtn.addEventListener("click", () => {
+            resetFormState();
+          });
+
+          prevBtn.addEventListener("click", () => {
+            activeDate = new Date(activeDate.getFullYear(), activeDate.getMonth() - 1, 1);
+            renderCalendar();
+          });
+
+          nextBtn.addEventListener("click", () => {
+            activeDate = new Date(activeDate.getFullYear(), activeDate.getMonth() + 1, 1);
+            renderCalendar();
+          });
+
+          document.getElementById("quick-add-booking").addEventListener("click", () => {
+            Tabs.show("bookings");
+            const today = DateUtils.todayIso();
+            const parsed = DateUtils.fromIso(today);
+            if (parsed) {
+              activeDate = parsed;
+              selectDate(today);
+            }
+            document.getElementById("booking-client").focus();
+            setDefaultBookingTimes(true);
+          });
+
+          return {
+            init() {
+              renderCalendar();
+            },
+            selectDate,
+            resetFormState,
+          };
+        })();
+
+        const Payments = (() => {
+          const invoiceForm = document.getElementById("invoice-form");
+          const invoiceSelect = invoiceForm.querySelector('select[name="bookingId"]');
+          const invoiceTable = document.getElementById("invoice-table");
+          const invoiceEmpty = document.getElementById("invoice-empty");
+          const invoiceCancelEdit = document.getElementById("invoice-cancel-edit");
+          const invoiceSubmit = invoiceForm.querySelector('button[type="submit"]');
+
+          const paymentsTable = document.getElementById("payments-table");
+          const paymentsEmpty = document.getElementById("payments-empty");
+          const paymentForm = document.getElementById("payment-form");
+          const paymentCancelEdit = document.getElementById("payment-cancel-edit");
+          const paymentSubmit = paymentForm.querySelector('button[type="submit"]');
+
+          let editingInvoiceId = null;
+          let editingPaymentId = null;
+
+          const refreshInvoiceOptions = () => {
+            const bookings = AppStore.getAllBookings();
+            invoiceSelect.innerHTML = "";
+            if (bookings.length === 0) {
+              const option = document.createElement("option");
+              option.textContent = "No bookings available";
+              option.value = "";
+              option.disabled = true;
+              invoiceSelect.appendChild(option);
+              invoiceSelect.disabled = true;
+              return;
+            }
+            invoiceSelect.disabled = false;
+            bookings.forEach((booking) => {
+              const option = document.createElement("option");
+              option.value = booking.id;
+              option.textContent = `${booking.client} — ${DateUtils.display(booking.date)} (${booking.service})`;
+              invoiceSelect.appendChild(option);
+            });
+          };
+
+          const resetInvoiceForm = () => {
+            editingInvoiceId = null;
+            invoiceForm.reset();
+            invoiceSubmit.textContent = "Save invoice";
+            invoiceCancelEdit.classList.add("hidden");
+            invoiceForm.removeAttribute("data-editing-id");
+            refreshInvoiceOptions();
+          };
+
+          const resetPaymentForm = () => {
+            editingPaymentId = null;
+            paymentForm.reset();
+            paymentSubmit.textContent = "Save payment";
+            paymentCancelEdit.classList.add("hidden");
+            paymentForm.removeAttribute("data-editing-id");
+            if (paymentForm.date) {
+              const today = DateUtils.todayIso();
+              paymentForm.date.value = today;
+            }
+            if (paymentForm.method) {
+              paymentForm.method.value = "Card";
+            }
+          };
+
+          const renderInvoices = () => {
+            const invoices = AppStore.getInvoices();
+            const bookings = new Map(
+              AppStore.getAllBookings().map((booking) => [booking.id, booking])
+            );
+            invoiceTable.innerHTML = "";
+            if (invoices.length === 0) {
+              invoiceEmpty.classList.remove("hidden");
+            } else {
+              invoiceEmpty.classList.add("hidden");
+            }
+            invoices.forEach((invoice) => {
+              const row = document.createElement("tr");
+
+              const numberCell = document.createElement("td");
+              numberCell.textContent = invoice.number || "—";
+
+              const bookingCell = document.createElement("td");
+              const booking = bookings.get(invoice.bookingId);
+              bookingCell.textContent = booking
+                ? `${booking.client} — ${booking.service}`
+                : "Booking archived";
+
+              const amountCell = document.createElement("td");
+              amountCell.textContent = `$${Number(invoice.amount || 0).toFixed(2)}`;
+
+              const statusCell = document.createElement("td");
+              const statusSelect = document.createElement("select");
+              statusSelect.dataset.id = invoice.id;
+              ["draft", "sent", "paid", "overdue"].forEach((optionValue) => {
+                const option = document.createElement("option");
+                option.value = optionValue;
+                option.textContent = optionValue.charAt(0).toUpperCase() + optionValue.slice(1);
+                if (invoice.status === optionValue) option.selected = true;
+                statusSelect.appendChild(option);
+              });
+              statusSelect.addEventListener("change", (event) => {
+                AppStore.updateInvoiceStatus(event.target.dataset.id, event.target.value);
+                Dashboard.refresh();
+                Reports.render();
+                Toast.show("Invoice status updated.", "success", { duration: 2500 });
+              });
+              statusCell.appendChild(statusSelect);
+
+              const dueDateCell = document.createElement("td");
+              dueDateCell.textContent = DateUtils.display(invoice.dueDate);
+
+              const actionsCell = document.createElement("td");
+              actionsCell.className = "table-actions";
+              const editBtn = document.createElement("button");
+              editBtn.type = "button";
+              editBtn.className = "btn btn-ghost btn-sm";
+              editBtn.textContent = "Edit";
+              editBtn.addEventListener("click", () => {
+                editingInvoiceId = invoice.id;
+                invoiceForm.dataset.editingId = invoice.id;
+                invoiceSubmit.textContent = "Update invoice";
+                invoiceCancelEdit.classList.remove("hidden");
+                refreshInvoiceOptions();
+                invoiceSelect.value = invoice.bookingId || "";
+                invoiceForm.amount.value = Number(invoice.amount || 0).toFixed(2);
+                invoiceForm.dueDate.value = invoice.dueDate || "";
+                invoiceSelect.focus();
+              });
+
+              const deleteBtn = document.createElement("button");
+              deleteBtn.type = "button";
+              deleteBtn.className = "btn btn-ghost btn-sm";
+              deleteBtn.textContent = "Delete";
+              deleteBtn.addEventListener("click", () => {
+                if (!AppStore.removeInvoice(invoice.id)) return;
+                if (editingInvoiceId === invoice.id) {
+                  resetInvoiceForm();
+                }
+                renderInvoices();
+                Dashboard.refresh();
+                Reports.render();
+                Toast.show("Invoice removed.", "success");
+              });
+
+              actionsCell.append(editBtn, deleteBtn);
+
+              row.append(numberCell, bookingCell, amountCell, statusCell, dueDateCell, actionsCell);
+              invoiceTable.appendChild(row);
+            });
+          };
+
+          const renderPayments = () => {
+            const payments = AppStore.getPayments();
+            paymentsTable.innerHTML = "";
+            if (payments.length === 0) {
+              paymentsEmpty.classList.remove("hidden");
+            } else {
+              paymentsEmpty.classList.add("hidden");
+            }
+            payments.forEach((payment) => {
+              const row = document.createElement("tr");
+
+              const dateCell = document.createElement("td");
+              dateCell.textContent = DateUtils.display(payment.date);
+
+              const clientCell = document.createElement("td");
+              clientCell.textContent = payment.client;
+
+              const amountCell = document.createElement("td");
+              amountCell.textContent = `$${Number(payment.amount || 0).toFixed(2)}`;
+
+              const methodCell = document.createElement("td");
+              methodCell.textContent = payment.method;
+
+              const referenceCell = document.createElement("td");
+              referenceCell.textContent = payment.reference || "—";
+
+              const actionsCell = document.createElement("td");
+              actionsCell.className = "table-actions";
+              const editBtn = document.createElement("button");
+              editBtn.type = "button";
+              editBtn.className = "btn btn-ghost btn-sm";
+              editBtn.textContent = "Edit";
+              editBtn.addEventListener("click", () => {
+                editingPaymentId = payment.id;
+                paymentForm.dataset.editingId = payment.id;
+                paymentSubmit.textContent = "Update payment";
+                paymentCancelEdit.classList.remove("hidden");
+                paymentForm.client.value = payment.client;
+                paymentForm.date.value = payment.date || DateUtils.todayIso();
+                paymentForm.amount.value = Number(payment.amount || 0).toFixed(2);
+                paymentForm.method.value = payment.method;
+                paymentForm.reference.value = payment.reference || "";
+                document.getElementById("payment-client").focus();
+              });
+
+              const deleteBtn = document.createElement("button");
+              deleteBtn.type = "button";
+              deleteBtn.className = "btn btn-ghost btn-sm";
+              deleteBtn.textContent = "Delete";
+              deleteBtn.addEventListener("click", () => {
+                if (!AppStore.removePayment(payment.id)) return;
+                if (editingPaymentId === payment.id) {
+                  resetPaymentForm();
+                }
+                renderPayments();
+                Dashboard.refresh();
+                Reports.render();
+                Toast.show("Payment removed.", "success");
+              });
+
+              actionsCell.append(editBtn, deleteBtn);
+
+              row.append(dateCell, clientCell, amountCell, methodCell, referenceCell, actionsCell);
+              paymentsTable.appendChild(row);
+            });
+          };
+
+          invoiceForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            if (invoiceSelect.disabled || !invoiceSelect.value) {
+              Toast.show("Select a booking before creating an invoice.", "error");
+              return;
+            }
+            const data = new FormData(invoiceForm);
+            const amount = Number(data.get("amount"));
+            const dueDate = String(data.get("dueDate"));
+            if (!Number.isFinite(amount) || amount <= 0) {
+              Toast.show("Invoice amount must be greater than zero.", "error");
+              return;
+            }
+            if (!DateUtils.fromIso(dueDate)) {
+              Toast.show("Provide a valid due date.", "error");
+              return;
+            }
+            const payload = {
+              bookingId: data.get("bookingId"),
+              amount,
+              dueDate,
+              number:
+                editingInvoiceId && AppStore.getInvoiceById(editingInvoiceId)
+                  ? AppStore.getInvoiceById(editingInvoiceId).number
+                  : `INV-${DateUtils.todayIso().replaceAll("-", "")}-${Math.random()
+                      .toString(36)
+                      .slice(2, 6)
+                      .toUpperCase()}`,
+              status:
+                editingInvoiceId && AppStore.getInvoiceById(editingInvoiceId)
+                  ? AppStore.getInvoiceById(editingInvoiceId).status || "draft"
+                  : "draft",
+            };
+            if (editingInvoiceId) {
+              AppStore.updateInvoice(editingInvoiceId, payload);
+              Toast.show("Invoice updated.", "success");
+            } else {
+              AppStore.addInvoice(payload);
+              Toast.show("Invoice created.", "success");
+            }
+            resetInvoiceForm();
+            renderInvoices();
+            Dashboard.refresh();
+            Reports.render();
+          });
+
+          invoiceCancelEdit.addEventListener("click", () => {
+            resetInvoiceForm();
+          });
+
+          paymentForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const data = new FormData(paymentForm);
+            const client = String(data.get("client") || "").trim();
+            const amount = Number(data.get("amount"));
+            const dateValue = String(data.get("date") || "").trim();
+            if (!client) {
+              Toast.show("Client is required.", "error");
+              return;
+            }
+            if (!Number.isFinite(amount) || amount <= 0) {
+              Toast.show("Payment amount must be greater than zero.", "error");
+              return;
+            }
+            if (!DateUtils.fromIso(dateValue)) {
+              Toast.show("Provide a valid payment date.", "error");
+              return;
+            }
+            const payload = {
+              date: dateValue,
+              client,
+              amount,
+              method: String(data.get("method") || "Card"),
+              reference: String(data.get("reference") || "").trim(),
+            };
+            if (editingPaymentId) {
+              AppStore.updatePayment(editingPaymentId, payload);
+              Toast.show("Payment updated.", "success");
+            } else {
+              AppStore.addPayment(payload);
+              Toast.show("Payment recorded.", "success");
+            }
+            resetPaymentForm();
+            renderPayments();
+            Dashboard.refresh();
+            Reports.render();
+          });
+
+          paymentCancelEdit.addEventListener("click", () => {
+            resetPaymentForm();
+          });
+
+          document.getElementById("quick-add-payment").addEventListener("click", () => {
+            Tabs.show("payments");
+            resetPaymentForm();
+            if (paymentForm.date) {
+              paymentForm.date.value = DateUtils.todayIso();
+            }
+            document.getElementById("payment-client").focus();
+          });
+
+          document.getElementById("generate-invoice").addEventListener("click", () => {
+            const invoices = AppStore.getInvoices();
+            if (invoices.length === 0) {
+              Toast.show("Create an invoice before exporting.", "warning");
+              return;
+            }
+            const settings = AppStore.settings;
+            const bookingIndex = new Map(
+              AppStore.getAllBookings().map((booking) => [booking.id, booking])
+            );
+            const doc = [
+              `${settings.name} • Invoice Summary`,
+              `Generated: ${new Date().toLocaleString()}`,
+              "",
+              ...invoices.map((invoice) => {
+                const booking = bookingIndex.get(invoice.bookingId);
+                const dueDisplay = DateUtils.display(invoice.dueDate);
+                return `${invoice.number || "INV"} • ${booking ? booking.client : "Booking archived"} • $${Number(
+                  invoice.amount || 0
+                ).toFixed(2)} • ${(invoice.status || "draft").toUpperCase()} • Due ${dueDisplay}`;
+              }),
+            ].join("\n");
+            const blob = new Blob([doc], { type: "text/plain;charset=utf-8" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            const safeName = TextUtils.sanitizeFileSegment(settings.name);
+            link.download = `${safeName}_invoice-summary.txt`;
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(() => {
+              URL.revokeObjectURL(link.href);
+              link.remove();
+            }, 0);
+            Toast.show("Invoice summary exported.", "success");
+          });
+
+          document.querySelectorAll('[data-export]').forEach((button) => {
+            button.addEventListener("click", () => {
+              const type = button.dataset.export;
+              let records = [];
+              let schema = [];
+              if (type === "bookings") {
+                records = AppStore.getAllBookings();
+                schema = ["id", "date", "client", "service", "startTime", "endTime", "status"];
+              } else if (type === "invoices") {
+                records = AppStore.getInvoices();
+                schema = ["id", "number", "bookingId", "amount", "status", "dueDate"];
+              } else if (type === "payments") {
+                records = AppStore.getPayments();
+                schema = ["id", "date", "client", "amount", "method", "reference"];
+              }
+              const header = schema.join(",");
+              const rows = records.map((record) =>
+                schema.map((key) => TextUtils.escapeCsvCell(record[key])).join(",")
+              );
+              const csv = [header, ...rows].join("\n");
+              const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+              const link = document.createElement("a");
+              link.href = URL.createObjectURL(blob);
+              const safeName = TextUtils.sanitizeFileSegment(AppStore.settings.name);
+              link.download = `${safeName}_${type}_${DateUtils.todayIso().replaceAll("-", "")}.csv`;
+              document.body.appendChild(link);
+              link.click();
+              setTimeout(() => {
+                URL.revokeObjectURL(link.href);
+                link.remove();
+              }, 0);
+              Toast.show(`${type.charAt(0).toUpperCase() + type.slice(1)} exported.`, "success");
+            });
+          });
+
+          const refreshAll = () => {
+            refreshInvoiceOptions();
+            renderInvoices();
+            renderPayments();
+          };
+
+          return {
+            init() {
+              refreshAll();
+              resetInvoiceForm();
+              resetPaymentForm();
+            },
+            refreshInvoiceOptions,
+            renderInvoices,
+            renderPayments,
+            refreshAll,
+            resetInvoiceForm,
+            resetPaymentForm,
+          };
+        })();
+
+        const Reports = (() => {
+          const canvas = document.getElementById("revenue-chart");
+          const emptyState = document.getElementById("revenue-chart-empty");
+          const highlightsList = document.getElementById("report-highlights");
+          const highlightsEmpty = document.getElementById("report-empty");
+          const summaryNode = document.getElementById("revenue-chart-summary");
+
+          const getAccentColor = () => {
+            const accent = getComputedStyle(document.documentElement).getPropertyValue("--brand-accent");
+            return accent ? accent.trim() : defaultState.settings.color;
+          };
+
+          const updateSummary = (dataset) => {
+            if (!summaryNode) return;
+            if (dataset.length === 0) {
+              summaryNode.textContent = "Revenue trend chart with no data yet.";
+              return;
+            }
+            const total = dataset.reduce((sum, item) => sum + item.total, 0);
+            const first = dataset[0];
+            const last = dataset[dataset.length - 1];
+            const average = total / dataset.length;
+            summaryNode.textContent = `Revenue trend from ${first.label} to ${last.label}. Total $${total.toFixed(
+              2
+            )} across ${dataset.length} month${dataset.length === 1 ? "" : "s"} with an average of $${average.toFixed(2)} per month.`;
+          };
+
+          const renderChart = (dataset) => {
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (dataset.length === 0) {
+              emptyState.classList.remove("hidden");
+              updateSummary([]);
+              return;
+            }
+            emptyState.classList.add("hidden");
+            const padding = 40;
+            const width = canvas.width - padding * 2;
+            const height = canvas.height - padding * 2;
+            const max = Math.max(...dataset.map((item) => item.total), 1);
+            ctx.strokeStyle = "rgba(148,163,184,0.35)";
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, padding + height);
+            ctx.lineTo(padding + width, padding + height);
+            ctx.stroke();
+            const accent = getAccentColor();
+            ctx.strokeStyle = accent || "#a855f7";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            dataset.forEach((item, index) => {
+              const x = padding + (index / Math.max(dataset.length - 1, 1)) * width;
+              const y = padding + height - (item.total / max) * height;
+              if (index === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+            ctx.fillStyle = accent || "#a855f7";
+            dataset.forEach((item, index) => {
+              const x = padding + (index / Math.max(dataset.length - 1, 1)) * width;
+              const y = padding + height - (item.total / max) * height;
+              ctx.beginPath();
+              ctx.arc(x, y, 4, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.fillStyle = "#fff";
+              ctx.font = "12px Inter, sans-serif";
+              ctx.fillText(item.label, x - 20, padding + height + 18);
+              ctx.fillStyle = accent || "#a855f7";
+            });
+          };
+
+          const renderHighlights = (dataset) => {
+            highlightsList.innerHTML = "";
+            if (dataset.length === 0) {
+              highlightsEmpty.classList.remove("hidden");
+              return;
+            }
+            highlightsEmpty.classList.add("hidden");
+            const total = dataset.reduce((sum, item) => sum + item.total, 0);
+            const sorted = [...dataset].sort((a, b) => b.total - a.total);
+            const best = sorted[0];
+            const worst = sorted[sorted.length - 1];
+            const entries = [
+              `Total revenue across ${dataset.length} months: $${total.toFixed(2)}`,
+              `Average monthly revenue: $${(total / dataset.length).toFixed(2)}`,
+              `Best month: ${best.label} with $${best.total.toFixed(2)}`,
+              `Lowest month: ${worst.label} with $${worst.total.toFixed(2)}`,
+            ];
+            entries.forEach((entry) => {
+              const li = document.createElement("li");
+              li.textContent = entry;
+              highlightsList.appendChild(li);
+            });
+          };
+
+          return {
+            render() {
+              const payments = AppStore.getPayments();
+              const grouped = new Map();
+              payments.forEach((payment) => {
+                const parsed = DateUtils.fromIso(payment.date);
+                if (!parsed) return;
+                const key = `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}`;
+                const label = parsed.toLocaleDateString(undefined, { month: "short", year: "numeric" });
+                if (!grouped.has(key)) grouped.set(key, { key, label, total: 0 });
+                grouped.get(key).total += Number(payment.amount || 0);
+              });
+              const dataset = Array.from(grouped.values()).sort((a, b) => a.key.localeCompare(b.key));
+              renderChart(dataset);
+              renderHighlights(dataset);
+              updateSummary(dataset);
+            },
+          };
+        })();
+
+        const Settings = (() => {
+          const form = document.getElementById("settings-form");
+          const preview = {
+            name: document.getElementById("brand-preview-name"),
+            email: document.getElementById("brand-preview-email"),
+            phone: document.getElementById("brand-preview-phone"),
+            address: document.getElementById("brand-preview-address"),
+          };
+          const brandingTitle = document.getElementById("branding-title");
+
+          const applyPreview = (settings) => {
+            brandingTitle.textContent = `${settings.name} Console`;
+            preview.name.textContent = settings.name;
+            preview.email.textContent = settings.email;
+            preview.phone.textContent = settings.phone || "—";
+            preview.address.textContent = settings.address || "—";
+            Theme.setAccent(settings.color || defaultState.settings.color);
+          };
+
+          form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const data = new FormData(form);
+            const updates = {
+              name: String(data.get("name") || "").trim(),
+              email: String(data.get("email") || "").trim(),
+              phone: String(data.get("phone") || "").trim(),
+              color: data.get("color") || "#3b82f6",
+              address: String(data.get("address") || "").trim(),
+            };
+            if (!updates.name || !updates.email) {
+              Toast.show("Name and email are required for branding.", "error");
+              return;
+            }
+            const updated = AppStore.updateSettings(updates);
+            applyPreview(updated);
+            Reports.render();
+            Toast.show("Brand settings saved.", "success");
+          });
+
+          return {
+            init() {
+              const settings = AppStore.settings;
+              form.name.value = settings.name;
+              form.email.value = settings.email;
+              form.phone.value = settings.phone;
+              form.color.value = settings.color;
+              form.address.value = settings.address;
+              applyPreview(settings);
+            },
+          };
+        })();
+
+        const Dashboard = (() => {
+          const summaryUpcoming = document.getElementById("summary-upcoming");
+          const summaryOpenInvoices = document.getElementById("summary-open-invoices");
+          const summaryMonthPayments = document.getElementById("summary-month-payments");
+          const notificationsList = document.getElementById("dashboard-notifications");
+          const emptyState = document.getElementById("dashboard-empty-state");
+
+          return {
+            refresh() {
+              const upcoming = AppStore.getUpcomingBookings();
+              const openInvoices = AppStore.getOpenInvoices();
+              const now = new Date();
+              const paymentsThisMonth = AppStore.getPaymentsForMonth(now.getFullYear(), now.getMonth());
+              const totalPayments = paymentsThisMonth.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+
+              summaryUpcoming.textContent = upcoming.length;
+              summaryOpenInvoices.textContent = openInvoices.length;
+              summaryMonthPayments.textContent = `$${totalPayments.toFixed(2)}`;
+
+              notificationsList.innerHTML = "";
+              const notifications = [];
+
+              upcoming.forEach((booking) => {
+                notifications.push({
+                  tone: "info",
+                  text: `${booking.client} — ${booking.service} on ${DateUtils.display(booking.date)} at ${booking.startTime}`,
+                });
+              });
+
+              openInvoices.forEach((invoice) => {
+                notifications.push({
+                  tone: invoice.status === "overdue" ? "warning" : "info",
+                  text: `${invoice.number || "Invoice"} is ${(invoice.status || "pending").toUpperCase()} and due ${DateUtils.display(
+                    invoice.dueDate
+                  )}`,
+                });
+              });
+
+              if (notifications.length === 0) {
+                emptyState.classList.remove("hidden");
+                return;
+              }
+
+              emptyState.classList.add("hidden");
+              notifications.forEach((notification) => {
+                const item = document.createElement("li");
+                item.className = "notification-item";
+                item.dataset.tone = notification.tone;
+
+                const dot = document.createElement("span");
+                dot.className = `notification-dot ${notification.tone === "warning" ? "warning" : "info"}`;
+
+                const text = document.createElement("p");
+                text.className = "text-small m-0";
+                text.textContent = notification.text;
+
+                item.append(dot, text);
+                notificationsList.appendChild(item);
+              });
+            },
+          };
+        })();
+
+        document.addEventListener("DOMContentLoaded", () => {
+          Tabs.show("dashboard");
+          Calendar.init();
+          Payments.init();
+          Settings.init();
+          Dashboard.refresh();
+          Reports.render();
+        });
+      })();
+    </script>
+  </body>
+</html>
