@@ -736,7 +736,7 @@
         <div class="grid gap-sm">
           <h2 id="subscription-blocked-title">Access restricted</h2>
           <p id="subscription-blocked-message" class="text-muted text-small">
-            Subscription inactive – please contact support.
+            Your subscription is inactive. Please contact support.
           </p>
           <button id="subscription-blocked-return" class="btn btn-primary" type="button">
             Back to sign in
@@ -3362,7 +3362,7 @@
 
 
         const Auth = (() => {
-          const SUBSCRIPTION_INACTIVE_MESSAGE = "Subscription inactive – please contact support.";
+          const SUBSCRIPTION_INACTIVE_MESSAGE = "Your subscription is inactive. Please contact support.";
           const client = globalThis.supabaseClient || null;
           const appShell = document.getElementById("app");
           const authScreen = document.getElementById("auth-container");
@@ -3511,13 +3511,18 @@
             Reports.render();
           };
 
-          const handleSessionChange = async (session, eventType = "STATE_CHANGE") => {
+          const handleSessionChange = async (session, eventType = "STATE_CHANGE", options = {}) => {
+            const {
+              subscriptionResult: providedSubscriptionResult,
+              suppressSignOutToast = false,
+            } = options;
 
             const wasAuthenticated = Boolean(activeUserId);
             if (session && session.user) {
               activeUserId = session.user.id;
               window.ZantraAuthUserId = activeUserId;
-              const subscriptionResult = await verifySubscription(activeUserId);
+              const subscriptionResult =
+                providedSubscriptionResult || (await verifySubscription(activeUserId));
               if (!subscriptionResult.allowed) {
                 pendingLoginToast = false;
                 subscriptionBlocked = subscriptionResult.code === "inactive";
@@ -3572,7 +3577,11 @@
               } else {
                 showScreen();
               }
-              if (!subscriptionBlocked && (wasAuthenticated || eventType === "SIGNED_OUT")) {
+              if (
+                !subscriptionBlocked &&
+                (wasAuthenticated || eventType === "SIGNED_OUT") &&
+                !suppressSignOutToast
+              ) {
                 Toast.show("Signed out.", "info");
               }
               if (typeof Sync?.handleLogout === "function") {
@@ -3608,7 +3617,12 @@
                     setError(error?.message || "Unable to sign in. Please check your credentials.");
                     return;
                   }
-                  await handleSessionChange(data.session, "MANUAL_SIGN_IN");
+
+                  const subscriptionResult = await verifySubscription(data.session.user.id);
+                  await handleSessionChange(data.session, "MANUAL_SIGN_IN", { subscriptionResult });
+                  if (!subscriptionResult.allowed) {
+                    return;
+                  }
 
                 } catch (error) {
                   pendingLoginToast = false;
@@ -3622,7 +3636,10 @@
 
             if (logoutButton) {
               logoutButton.addEventListener("click", async () => {
-                if (!client) return;
+                if (!client) {
+                  await handleSessionChange(null, "MANUAL_SIGN_OUT");
+                  return;
+                }
                 logoutButton.disabled = true;
                 try {
                   const { error } = await client.auth.signOut();
@@ -3633,6 +3650,7 @@
                   console.error("Failed to sign out", error);
                   Toast.show("Could not sign out. Please try again.", "error");
                 } finally {
+                  await handleSessionChange(null, "MANUAL_SIGN_OUT", { suppressSignOutToast: true });
                   logoutButton.disabled = false;
                 }
               });
@@ -3658,12 +3676,9 @@
             hideSubscriptionBlocked();
 
             if (!client) {
-              if (authScreen) authScreen.classList.add("hidden");
-              appShell.classList.remove("hidden");
-              if (logoutButton) logoutButton.classList.add("hidden");
-              await bootstrapApp();
-
-              Toast.show("Authentication client unavailable. Loaded offline mode.", "warning");
+              showScreen();
+              setError("Authentication is unavailable. Please try again later.");
+              Toast.show("Authentication is unavailable. Please try again later.", "error");
               return;
             }
 
