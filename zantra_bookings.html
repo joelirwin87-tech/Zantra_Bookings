@@ -31,6 +31,7 @@
     </script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
     <style>
       :root {
         color-scheme: dark;
@@ -852,6 +853,7 @@
                   aria-describedby="revenue-chart-summary report-highlights"
                 ></canvas>
               </div>
+
               <p id="revenue-chart-summary" class="visually-hidden">
                 Revenue trend chart with no data yet.
               </p>
@@ -2019,6 +2021,7 @@
 
         const Reports = (() => {
           const chartCanvas = document.getElementById("revenue-chart");
+
           const emptyState = document.getElementById("revenue-chart-empty");
           const highlightsList = document.getElementById("report-highlights");
           const highlightsEmpty = document.getElementById("report-empty");
@@ -2043,6 +2046,7 @@
 
           let chartInstance = null;
 
+
           const getAccentColor = () => {
             const accent = getComputedStyle(document.documentElement).getPropertyValue("--brand-accent");
             return accent ? accent.trim() : defaultState.settings.color;
@@ -2066,6 +2070,7 @@
             const b = numeric & 255;
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
           };
+
 
           const updateSummary = (dataset) => {
             if (!summaryNode) return;
@@ -2185,6 +2190,7 @@
               delete chartInstance.options.scales.y.suggestedMax;
             }
             chartInstance.update();
+
           };
 
           const renderHighlights = (dataset) => {
