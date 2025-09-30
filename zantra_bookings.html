@@ -724,6 +724,26 @@
         </div>
       </form>
     </div>
+    <div
+      id="subscription-blocked"
+      class="auth-container hidden"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="subscription-blocked-title"
+      aria-describedby="subscription-blocked-message"
+    >
+      <div class="card auth-card text-center">
+        <div class="grid gap-sm">
+          <h2 id="subscription-blocked-title">Access restricted</h2>
+          <p id="subscription-blocked-message" class="text-muted text-small">
+            Subscription inactive – please contact support.
+          </p>
+          <button id="subscription-blocked-return" class="btn btn-primary" type="button">
+            Back to sign in
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="app-shell hidden" id="app">
       <header class="card app-header">
         <div class="grid grid-2 gap-md items-start">
@@ -3342,6 +3362,7 @@
 
 
         const Auth = (() => {
+          const SUBSCRIPTION_INACTIVE_MESSAGE = "Subscription inactive – please contact support.";
           const client = globalThis.supabaseClient || null;
           const appShell = document.getElementById("app");
           const authScreen = document.getElementById("auth-container");
@@ -3351,11 +3372,21 @@
           const submitButton = document.getElementById("login-submit");
           const errorNode = document.getElementById("login-error");
           const logoutButton = document.getElementById("logout-button");
+          const subscriptionScreen = document.getElementById("subscription-blocked");
+          const subscriptionMessageNode = document.getElementById(
+            "subscription-blocked-message",
+          );
+          const subscriptionReturnButton = document.getElementById(
+            "subscription-blocked-return",
+          );
 
           let activeUserId = null;
           let bootstrapped = false;
           let pendingLoginToast = false;
           window.ZantraAuthUserId = null;
+          let subscriptionBlocked = false;
+          let subscriptionBlockedMessage = SUBSCRIPTION_INACTIVE_MESSAGE;
+          let lastSubscriptionError = "";
 
           const setError = (message) => {
             if (!errorNode) return;
@@ -3384,7 +3415,24 @@
             });
           };
 
+          const hideSubscriptionBlocked = () => {
+            if (subscriptionScreen) subscriptionScreen.classList.add("hidden");
+          };
+
+          const showSubscriptionBlocked = (message) => {
+            if (subscriptionMessageNode && message) {
+              subscriptionMessageNode.textContent = message;
+            }
+            if (authScreen) authScreen.classList.add("hidden");
+            if (appShell) appShell.classList.add("hidden");
+            if (logoutButton) logoutButton.classList.add("hidden");
+            if (subscriptionScreen) subscriptionScreen.classList.remove("hidden");
+            setError("");
+            setLoading(false);
+          };
+
           const showScreen = () => {
+            hideSubscriptionBlocked();
             if (authScreen) authScreen.classList.remove("hidden");
             if (appShell) appShell.classList.add("hidden");
             if (logoutButton) logoutButton.classList.add("hidden");
@@ -3394,12 +3442,49 @@
           };
 
           const hideScreen = () => {
+            hideSubscriptionBlocked();
             if (authScreen) authScreen.classList.add("hidden");
             if (appShell) appShell.classList.remove("hidden");
             if (logoutButton) logoutButton.classList.remove("hidden");
             if (loginForm) loginForm.reset();
             setError("");
             setLoading(false);
+          };
+
+          const verifySubscription = async (userId) => {
+            const defaultError = "Unable to verify subscription. Please try again later.";
+            if (!client) {
+              return { allowed: false, code: "error", message: defaultError };
+            }
+            try {
+              const { data, error } = await client
+                .from("profiles")
+                .select("active_subscription")
+                .eq("id", userId)
+                .maybeSingle();
+              if (error) {
+                console.error("Subscription lookup failed", error);
+                return { allowed: false, code: "error", message: defaultError };
+              }
+              if (!data) {
+                return {
+                  allowed: false,
+                  code: "inactive",
+                  message: SUBSCRIPTION_INACTIVE_MESSAGE,
+                };
+              }
+              if (data.active_subscription) {
+                return { allowed: true };
+              }
+              return {
+                allowed: false,
+                code: "inactive",
+                message: SUBSCRIPTION_INACTIVE_MESSAGE,
+              };
+            } catch (error) {
+              console.error("Subscription enforcement failed", error);
+              return { allowed: false, code: "error", message: defaultError };
+            }
           };
 
           const bootstrapApp = async () => {
@@ -3432,6 +3517,38 @@
             if (session && session.user) {
               activeUserId = session.user.id;
               window.ZantraAuthUserId = activeUserId;
+              const subscriptionResult = await verifySubscription(activeUserId);
+              if (!subscriptionResult.allowed) {
+                pendingLoginToast = false;
+                subscriptionBlocked = subscriptionResult.code === "inactive";
+                subscriptionBlockedMessage =
+                  subscriptionResult.message || SUBSCRIPTION_INACTIVE_MESSAGE;
+
+                if (subscriptionBlocked) {
+                  showSubscriptionBlocked(subscriptionBlockedMessage);
+                  if (typeof window !== "undefined") {
+                    window.alert(subscriptionBlockedMessage);
+                  }
+                  lastSubscriptionError = "";
+                } else {
+                  setError(subscriptionBlockedMessage);
+                  showScreen();
+                  lastSubscriptionError = subscriptionBlockedMessage;
+                }
+
+                try {
+                  await client.auth.signOut();
+                } catch (error) {
+                  console.error("Failed to sign out after subscription enforcement", error);
+                }
+                activeUserId = null;
+                window.ZantraAuthUserId = null;
+                return;
+              }
+
+              subscriptionBlocked = false;
+              subscriptionBlockedMessage = SUBSCRIPTION_INACTIVE_MESSAGE;
+              hideSubscriptionBlocked();
               hideScreen();
               await bootstrapApp();
               if (typeof Sync?.handleLogin === "function") {
@@ -3442,12 +3559,20 @@
                 Toast.show("Signed in successfully.", "success");
               }
               pendingLoginToast = false;
+              lastSubscriptionError = "";
             } else {
               activeUserId = null;
               window.ZantraAuthUserId = null;
               setError("");
-              showScreen();
-              if (wasAuthenticated || eventType === "SIGNED_OUT") {
+              if (!subscriptionBlocked && lastSubscriptionError) {
+                setError(lastSubscriptionError);
+              }
+              if (subscriptionBlocked) {
+                showSubscriptionBlocked(subscriptionBlockedMessage);
+              } else {
+                showScreen();
+              }
+              if (!subscriptionBlocked && (wasAuthenticated || eventType === "SIGNED_OUT")) {
                 Toast.show("Signed out.", "info");
               }
               if (typeof Sync?.handleLogout === "function") {
@@ -3512,6 +3637,16 @@
                 }
               });
             }
+
+            if (subscriptionReturnButton) {
+              subscriptionReturnButton.addEventListener("click", () => {
+                subscriptionBlocked = false;
+                subscriptionBlockedMessage = SUBSCRIPTION_INACTIVE_MESSAGE;
+                lastSubscriptionError = "";
+                hideSubscriptionBlocked();
+                showScreen();
+              });
+            }
           };
 
           const init = async () => {
@@ -3519,6 +3654,8 @@
               console.error("Application shell is missing; cannot initialize auth.");
               return;
             }
+
+            hideSubscriptionBlocked();
 
             if (!client) {
               if (authScreen) authScreen.classList.add("hidden");
