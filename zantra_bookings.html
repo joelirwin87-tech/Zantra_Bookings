@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zantra Bookings Console</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
+  sans-serif;
+        --slate-950: #020617;
+        --slate-900: #0f172a;
+        --slate-800: #1e293b;
+        --slate-700: #334155;
+        --slate-600: #475569;
+        --slate-500: #64748b;
+        --slate-400: #94a3b8;
+        --slate-300: #cbd5f5;
+        --blue-500: #3b82f6;
+        --blue-400: #60a5fa;
+        --emerald-500: #10b981;
+        --emerald-400: #34d399;
+        --amber-400: #fbbf24;
+        --white: #ffffff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background-color: var(--slate-950);
+        color: var(--slate-100, #f8fafc);
+        min-height: 100vh;
+        font-family: inherit;
+        line-height: 1.6;
+      }
+      h1, h2, h3, h4 { margin: 0; }
+      a, button, input, select, textarea { font: inherit; color: inherit; }
+      button { cursor: pointer; border: none; background: none; }
+      input, select, textarea {
+        background-color: var(--slate-900);
+        border: 1px solid var(--slate-700);
+        color: inherit;
+        border-radius: 0.75rem;
+        padding: 0.5rem 0.75rem;
+      }
+      .app-shell { max-width: 1120px; margin: 0 auto; padding: 2rem 1.25rem; display: grid;
+  gap: 1.5rem; }
+      .card {
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 25px 60px rgba(2, 6, 23, 0.45);
+        backdrop-filter: blur(12px);
+      }
+      .header-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+      .btn {
+        border-radius: 0.75rem;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        transition: background 0.2s ease, transform 0.15s ease;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: rgba(15, 23, 42, 0.85);
+      }
+      .btn:hover { transform: translateY(-1px); background: rgba(15, 23, 42, 0.95); }
+      .btn-primary {
+        background: var(--blue-500);
+        color: var(--white);
+        border: none;
+      }
+      .btn-primary:hover { background: var(--blue-400); }
+      nav ul {
+        list-style: none; padding: 0; margin: 0; display: flex;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 0.75rem;
+        overflow: hidden;
+      }
+      nav button {
+        flex: 1 1 0;
+        padding: 0.75rem 1rem;
+        text-align: center;
+        font-weight: 600;
+        background: rgba(15, 23, 42, 0.6);
+        transition: background 0.2s ease;
+      }
+      nav button.active { background: rgba(59, 130, 246, 0.15); }
+      .grid {
+        display: grid;
+        gap: 1.25rem;
+      }
+      @media (min-width: 900px) {
+        .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      }
+      .list-plain { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem; }
+      .badge {
+        padding: 0.2rem 0.5rem;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+      .badge-confirmed { background: rgba(16, 185, 129, 0.12); color: var(--emerald-400); }
+      .badge-pending   { background: rgba(251, 191, 36, 0.12); color: var(--amber-400); }
+      .badge-default   { background: rgba(148, 163, 184, 0.12); color: var(--slate-300); }
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 0.5rem;
+      }
+      .calendar-cell {
+        position: relative;
+        min-height: 96px;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        background: rgba(2, 6, 23, 0.85);
+        padding: 0.75rem;
+        text-align: left;
+        display: grid;
+        gap: 0.35rem;
+        align-content: start;
+      }
+      .calendar-cell.active {
+        border-color: var(--blue-500);
+        background: rgba(59, 130, 246, 0.18);
+      }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      .table thead { color: var(--slate-400); font-weight: 600; }
+      .table th, .table td {
+        padding: 0.6rem 0.5rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      }
+      .empty { color: var(--slate-500); font-size: 0.9rem; }
+      .toast-region {
+        position: fixed;
+        top: 1.25rem;
+        right: 1.25rem;
+        display: grid;
+        gap: 0.75rem;
+        z-index: 1000;
+        pointer-events: none;
+      }
+      .toast {
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 0.9rem;
+        padding: 0.85rem 1rem;
+        box-shadow: 0 20px 45px rgba(2, 6, 23, 0.5);
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        pointer-events: auto;
+      }
+      .toast.visible { opacity: 1; transform: translateY(0); }
+      .toast[data-tone="success"] { border-color: rgba(16, 185, 129, 0.5); }
+      .toast[data-tone="error"]   { border-color: rgba(244, 63, 94, 0.5); }
+      .toast[data-tone="warning"] { border-color: rgba(251, 191, 36, 0.5); }
+      .hidden { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <div id="toast-region" class="toast-region" aria-live="assertive" aria-atomic="true"></
+  div>
+    <div class="app-shell" id="app">
+      <header class="card">
+        <div class="grid grid-2" style="gap: 1rem;">
+          <div>
+            <h1 class="text-3xl" id="branding-title">Zantra Bookings Suite</h1>
+            <p style="color: var(--slate-400); margin-top: 0.5rem;">
+              Manage bookings, invoices, and brand preferences from a single enterprise-
+  ready console.
+            </p>
+          </div>
+          <div class="header-actions" style="justify-content: flex-end; align-items: flex-
+  start;">
+            <button id="quick-add-booking" class="btn btn-primary" type="button">Quick Add
+  Booking</button>
+            <button id="quick-add-payment" class="btn" type="button">Record Payment</button>
+          </div>
+        </div>
+      </header>
+
+      <nav>
+        <ul>
+          <li><button class="tab-button active" data-tab="dashboard"
+  type="button">Dashboard</button></li>
+          <li><button class="tab-button" data-tab="bookings" type="button">Calendar &amp;
+  Bookings</button></li>
+          <li><button class="tab-button" data-tab="payments" type="button">Payments &amp;
+  Invoicing</button></li>
+          <li><button class="tab-button" data-tab="reports" type="button">Reports &amp;
+  Exports</button></li>
+          <li><button class="tab-button" data-tab="settings" type="button">Settings &amp;
+  Branding</button></li>
+        </ul>
+      </nav>
+
+      <main class="grid" style="gap: 2rem;">
+        <section id="tab-dashboard" class="tab-panel">
+          <div class="grid grid-3">
+            <div class="card">
+              <h2>At a Glance</h2>
+              <dl class="list-plain" style="margin-top: 1rem;">
+                <div class="grid" style="grid-auto-flow: column; justify-content: space-
+  between;">
+                  <dt style="color: var(--slate-400);">Upcoming bookings</dt>
+                  <dd id="summary-upcoming" style="font-weight: 700;">0</dd>
+                </div>
+                <div class="grid" style="grid-auto-flow: column; justify-content: space-
+  between;">
+                  <dt style="color: var(--slate-400);">Open invoices</dt>
+                  <dd id="summary-open-invoices" style="font-weight: 700;">0</dd>
+                </div>
+                <div class="grid" style="grid-auto-flow: column; justify-content: space-
+  between;">
+                  <dt style="color: var(--slate-400);">Payments this month</dt>
+                  <dd id="summary-month-payments" style="font-weight: 700;">$0.00</dd>
+                </div>
+              </dl>
+            </div>
+            <div class="card" style="grid-column: span 2;">
+              <h2>Notifications</h2>
+              <ul id="dashboard-notifications" class="list-plain" style="margin-top:
+  1rem;"></ul>
+              <p id="dashboard-empty-state" class="empty">No new notifications. All systems
+  operating smoothly.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-bookings" class="tab-panel hidden">
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="grid grid-2" style="align-items: center;">
+                <div>
+                  <h2>Booking Calendar</h2>
+                  <p style="color: var(--slate-400); font-size: 0.9rem;">Select a day to
+  review or add client sessions.</p>
+                </div>
+                <div style="justify-self: end; display: flex; gap: 0.5rem;">
+                  <button id="calendar-prev" class="btn" type="button">Prev</button>
+                  <span id="calendar-month" style="font-weight: 700;"></span>
+                  <button id="calendar-next" class="btn" type="button">Next</button>
+                </div>
+              </div>
+              <div class="calendar-grid" style="margin-top: 1rem;" aria-label="Calendar
+  grid">
+                <div style="text-align: center; font-weight: 600; color: var(--slate-
+  500);">Sun</div>
+                <div style="text-align: center; font-weight: 600; color: var(--slate-
+  500);">Mon</div>
+                <div style="text-align: center; font-weight: 600; color: var(--slate-
+  500);">Tue</div>
+                <div style="text-align: center; font-weight: 600; color: var(--slate-
+  500);">Wed</div>
+                <div style="text-align: center; font-weight: 600; color: var(--slate-
+  500);">Thu</div>
+                <div style="text-align: center; font-weight: 600; color: var(--slate-
+  500);">Fri</div>
+                <div style="text-align: center; font-weight: 600; color: var(--slate-
+  500);">Sat</div>
+              </div>
+              <div id="calendar-grid" class="calendar-grid" style="margin-top: 0.75rem;"></
+  div>
+            </div>
+
+            <div class="card" style="display: grid; gap: 1.25rem;">
+              <div>
+                <h3>Bookings on <span id="selected-date-label">Select a date</span></h3>
+                <ul id="booking-list" class="list-plain" style="margin-top: 1rem;"></ul>
+                <p id="booking-empty" class="empty">No bookings scheduled yet.</p>
+              </div>
+              <form id="booking-form" class="grid" style="gap: 0.75rem;" autocomplete="off">
+                <h4>Add booking</h4>
+                <label>Client name
+                  <input type="text" name="client" required placeholder="Client name" />
+                </label>
+                <label>Service
+                  <input type="text" name="service" required placeholder="Service
+  description" />
+                </label>
+                <label>Start time
+                  <input type="time" name="startTime" required />
+                </label>
+                <label>End time
+                  <input type="time" name="endTime" required />
+                </label>
+                <label>Status
+                  <select name="status">
+                    <option value="confirmed">Confirmed</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </label>
+                <button type="submit" class="btn btn-primary">Save booking</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-payments" class="tab-panel hidden">
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="grid grid-2" style="align-items: center;">
+                <h2>Invoices</h2>
+                <button id="generate-invoice" class="btn btn-primary" type="button">Generate
+  PDF Invoice</button>
+              </div>
+              <table class="table" style="margin-top: 1rem;">
+                <thead>
+                  <tr>
+                    <th>Invoice #</th>
+                    <th>Booking</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Due date</th>
+                  </tr>
+                </thead>
+                <tbody id="invoice-table"></tbody>
+              </table>
+              <p id="invoice-empty" class="empty">No invoices available. Create one from a
+  booking.</p>
+            </div>
+
+            <div class="card">
+              <h2>Payments</h2>
+              <table class="table" style="margin-top: 1rem;">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Client</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Reference</th>
+                  </tr>
+                </thead>
+                <tbody id="payments-table"></tbody>
+              </table>
+              <p id="payments-empty" class="empty">No payments recorded yet.</p>
+            </div>
+
+            <div class="card">
+              <h3>Create invoice</h3>
+              <form id="invoice-form" class="grid" style="gap: 0.75rem;" autocomplete="off">
+                <label>Booking
+                  <select name="bookingId" required></select>
+                </label>
+                <label>Amount
+                  <input type="number" name="amount" step="0.01" min="0" required
+  placeholder="0.00" />
+                </label>
+                <label>Due date
+                  <input type="date" name="dueDate" required />
+                </label>
+                <button type="submit" class="btn btn-primary">Save invoice</button>
+              </form>
+            </div>
+
+            <div class="card">
+              <h3>Record payment</h3>
+              <form id="payment-form" class="grid" style="gap: 0.75rem;" autocomplete="off">
+                <label>Client
+                  <input type="text" name="client" required placeholder="Client name" />
+                </label>
+                <label>Amount
+                  <input type="number" name="amount" step="0.01" min="0" required
+  placeholder="0.00" />
+                </label>
+                <label>Method
+                  <select name="method">
+                    <option value="Card">Card</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Transfer">Transfer</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </label>
+                <label>Reference
+                  <input type="text" name="reference" placeholder="Optional reference" />
+                </label>
+                <button type="submit" class="btn btn-primary">Save payment</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-reports" class="tab-panel hidden">
+          <div class="grid grid-2">
+            <div class="card">
+              <h2>Revenue trend</h2>
+              <canvas id="revenue-chart" style="margin-top: 1rem;" width="640" height="320"
+  role="img" aria-label="Revenue trend chart"></canvas>
+              <p id="revenue-chart-empty" class="empty">Add payments to generate the revenue
+  chart.</p>
+            </div>
+            <div class="card">
+              <h2>Highlights</h2>
+              <ul id="report-highlights" class="list-plain" style="margin-top: 1rem;"></ul>
+              <p id="report-empty" class="empty">When payments are logged the highlights
+  will appear here.</p>
+            </div>
+          </div>
+          <div class="card" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="btn" data-export="bookings" type="button">Export bookings CSV</
+  button>
+            <button class="btn" data-export="invoices" type="button">Export invoices CSV</
+  button>
+            <button class="btn" data-export="payments" type="button">Export payments CSV</
+  button>
+          </div>
+        </section>
+
+        <section id="tab-settings" class="tab-panel hidden">
+          <div class="grid grid-2">
+            <div class="card">
+              <h2>Brand identity</h2>
+              <form id="settings-form" class="grid" style="gap: 0.75rem; margin-top: 1rem;"
+  autocomplete="off">
+                <label>Business name
+                  <input type="text" name="name" required />
+                </label>
+                <label>Support email
+                  <input type="email" name="email" required />
+                </label>
+                <label>Phone
+                  <input type="text" name="phone" />
+                </label>
+                <label>Accent color
+                  <input type="color" name="color" />
+                </label>
+                <label>Address
+                  <textarea name="address" rows="3"></textarea>
+                </label>
+                <button type="submit" class="btn btn-primary">Update branding</button>
+              </form>
+            </div>
+            <div class="card">
+              <h3>Brand preview</h3>
+              <div id="brand-preview" style="margin-top: 1rem; padding: 1rem; border-radius:
+  0.75rem; border: 1px solid rgba(148, 163, 184, 0.2);">
+                <h4 id="brand-preview-name" style="font-size: 1.35rem;">Zantra Studios</h4>
+                <p id="brand-preview-email" style="color: var(--slate-
+  400);">team@zantra.com</p>
+                <p id="brand-preview-phone" style="color: var(--slate-400);">+1 (555) 123-
+  4567</p>
+                <p id="brand-preview-address" style="color: var(--slate-300); margin-top:
+  0.75rem;">
+                  123 Market Street, Suite 400, San Francisco, CA
+                </p>
+              </div>
+              <div style="margin-top: 1rem; color: var(--slate-400); font-size: 0.9rem;">
+                <p>Tips:</p>
+                <ul style="margin: 0.5rem 0 0 1.25rem;">
+                  <li>Keep the accent colour aligned with your design system.</li>
+                  <li>Ensure support details stay current for invoices.</li>
+                  <li>Update settings before exporting PDFs to refresh branding.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script>
+      (function () {
+        "use strict";
+
+        const safeClone = globalThis.structuredClone ?? ((obj) =>
+  JSON.parse(JSON.stringify(obj)));
+
+        const DateUtils = (() => {
+          const pad = (value) => String(value).padStart(2, "0");
+          const toIso = (date) => {
+            if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}
+  `;
+          };
+          const fromIso = (value) => {
+            if (typeof value !== "string") return null;
+            const parts = value.split("-");
+            if (parts.length !== 3) return null;
+            const [yearStr, monthStr, dayStr] = parts;
+            const year = Number(yearStr);
+            const monthIndex = Number(monthStr) - 1;
+            const day = Number(dayStr);
+            if (!Number.isInteger(year) || !Number.isInteger(monthIndex) || !
+  Number.isInteger(day)) return null;
+            const candidate = new Date(year, monthIndex, day);
+            if (
+              candidate.getFullYear() !== year ||
+              candidate.getMonth() !== monthIndex ||
+              candidate.getDate() !== day
+            ) {
+              return null;
+            }
+            return candidate;
+          };
+          const todayIso = () => toIso(new Date());
+          const display = (isoString) => {
+            const parsed = fromIso(isoString);
+            if (!parsed) return "—";
+            return parsed.toLocaleDateString(undefined, { month: "short", day: "numeric",
+  year: "numeric" });
+          };
+          return { toIso, fromIso, todayIso, display };
+        })();
+
+        const Toast = (() => {
+          const region = document.getElementById("toast-region");
+          const show = (message, tone = "info", options = {}) => {
+            if (!region || !message) return;
+            const toast = document.createElement("div");
+            toast.className = "toast";
+            toast.dataset.tone = tone;
+            toast.setAttribute("role", "alert");
+            toast.textContent = message;
+            region.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add("visible"));
+            const duration = Number.isFinite(options.duration) ? options.duration : 4000;
+            setTimeout(() => {
+              toast.classList.remove("visible");
+              setTimeout(() => toast.remove(), 250);
+            }, Math.max(duration, 1600));
+          };
+          return { show };
+        })();
+
+        const STORAGE_KEY = "zantra_bookings_v2";
+        const defaultState = {
+          bookings: [],
+          invoices: [],
+          payments: [],
+          settings: {
+            name: "Zantra Studios",
+            email: "team@zantra.com",
+            phone: "+1 (555) 123-4567",
+            color: "#3b82f6",
+            address: "123 Market Street, Suite 400, San Francisco, CA",
+          },
+        };
+
+        const AppStore = (() => {
+          let state = load();
+
+          function load() {
+            try {
+              const raw = localStorage.getItem(STORAGE_KEY);
+              if (!raw) return safeClone(defaultState);
+              const parsed = JSON.parse(raw);
+              return {
+                bookings: Array.isArray(parsed.bookings) ? parsed.bookings : [],
+                invoices: Array.isArray(parsed.invoices) ? parsed.invoices : [],
+                payments: Array.isArray(parsed.payments) ? parsed.payments : [],
+                settings: Object.assign({}, defaultState.settings, parsed.settings || {}),
+              };
+            } catch (error) {
+              console.error("Failed to load persisted data", error);
+              return safeClone(defaultState);
+            }
+          }
+
+          function persist() {
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (error) {
+              console.error("Failed to persist data", error);
+            }
+          }
+
+          const randomId = (prefix) => {
+            const id = typeof crypto !== "undefined" && crypto.randomUUID ?
+  crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+            return `${prefix}_${id}`;
+          };
+
+          return {
+            get settings() {
+              return safeClone(state.settings);
+            },
+            updateSettings(updates) {
+              state.settings = Object.assign({}, state.settings, updates);
+              persist();
+              return safeClone(state.settings);
+            },
+            addBooking(booking) {
+              const entry = Object.assign({ id: randomId("booking") }, booking);
+              state.bookings.push(entry);
+              persist();
+              return safeClone(entry);
+            },
+            getBookingsByDate(iso) {
+              return state.bookings.filter((item) => item.date === iso).map((item) =>
+  safeClone(item));
+            },
+            getAllBookings() {
+              return safeClone(state.bookings);
+            },
+            getUpcomingBookings() {
+              const today = DateUtils.todayIso();
+              return state.bookings
+                .filter((item) => item.date >= today)
+                .sort((a, b) => a.date.localeCompare(b.date))
+                .slice(0, 5)
+                .map((item) => safeClone(item));
+            },
+            addInvoice(invoice) {
+              const entry = Object.assign({ id: randomId("invoice") }, invoice);
+              state.invoices.push(entry);
+              persist();
+              return safeClone(entry);
+            },
+            updateInvoiceStatus(id, status) {
+              const index = state.invoices.findIndex((item) => item.id === id);
+              if (index === -1) return null;
+              state.invoices[index].status = status;
+              persist();
+              return safeClone(state.invoices[index]);
+            },
+            getInvoices() {
+              return safeClone(state.invoices);
+            },
+            getOpenInvoices() {
+              return state.invoices.filter((invoice) => invoice.status !==
+  "paid").map((invoice) => safeClone(invoice));
+            },
+            addPayment(payment) {
+              const entry = Object.assign({ id: randomId("payment") }, payment);
+              state.payments.push(entry);
+              persist();
+              return safeClone(entry);
+            },
+            getPayments() {
+              return safeClone(state.payments);
+            },
+            getPaymentsForMonth(year, monthIndex) {
+              return state.payments
+                .filter((payment) => {
+                  const parsed = DateUtils.fromIso(payment.date);
+                  return parsed && parsed.getFullYear() === year && parsed.getMonth() ===
+  monthIndex;
+                })
+                .map((item) => safeClone(item));
+            },
+          };
+        })();
+
+        const Tabs = (() => {
+          const buttons = Array.from(document.querySelectorAll(".tab-button"));
+          const panels = Array.from(document.querySelectorAll(".tab-panel"));
+
+          const show = (name) => {
+            buttons.forEach((button) => {
+              const isActive = button.dataset.tab === name;
+              button.classList.toggle("active", isActive);
+            });
+            panels.forEach((panel) => {
+              panel.classList.toggle("hidden", panel.id !== `tab-${name}`);
+            });
+          };
+
+          buttons.forEach((button) =>
+            button.addEventListener("click", () => show(button.dataset.tab))
+          );
+
+          return { show };
+        })();
+
+        const Calendar = (() => {
+          const grid = document.getElementById("calendar-grid");
+          const monthLabel = document.getElementById("calendar-month");
+          const selectedLabel = document.getElementById("selected-date-label");
+          const bookingList = document.getElementById("booking-list");
+          const bookingEmpty = document.getElementById("booking-empty");
+          const prevBtn = document.getElementById("calendar-prev");
+          const nextBtn = document.getElementById("calendar-next");
+          const form = document.getElementById("booking-form");
+
+          let activeDate = new Date();
+          let selectedIso = null;
+
+          const renderCalendar = () => {
+            const year = activeDate.getFullYear();
+            const month = activeDate.getMonth();
+            const first = new Date(year, month, 1);
+            const last = new Date(year, month + 1, 0);
+
+            monthLabel.textContent = activeDate.toLocaleDateString(undefined, { month:
+  "long", year: "numeric" });
+
+            grid.innerHTML = "";
+            for (let i = 0; i < first.getDay(); i += 1) {
+              const placeholder = document.createElement("div");
+              placeholder.style.minHeight = "96px";
+              grid.appendChild(placeholder);
+            }
+
+            for (let day = 1; day <= last.getDate(); day += 1) {
+              const current = new Date(year, month, day);
+              const iso = DateUtils.toIso(current);
+              const cell = document.createElement("button");
+              cell.type = "button";
+              cell.className = "calendar-cell";
+              if (iso === selectedIso) cell.classList.add("active");
+              cell.innerHTML = `
+                <strong>${day}</strong>
+                <span style="color: var(--slate-500); font-size:
+  0.7rem;">${AppStore.getBookingsByDate(iso).length} bookings</span>
+              `;
+              cell.addEventListener("click", () => selectDate(iso));
+              grid.appendChild(cell);
+            }
+          };
+
+          const renderBookings = () => {
+            bookingList.innerHTML = "";
+            if (!selectedIso) {
+              bookingEmpty.classList.remove("hidden");
+              return;
+            }
+            const bookings = AppStore.getBookingsByDate(selectedIso).sort((a, b) =>
+  a.startTime.localeCompare(b.startTime));
+            if (bookings.length === 0) {
+              bookingEmpty.classList.remove("hidden");
+              return;
+            }
+            bookingEmpty.classList.add("hidden");
+            bookings.forEach((booking) => {
+              const item = document.createElement("li");
+              const badgeClass =
+                booking.status === "confirmed" ? "badge badge-confirmed" :
+                booking.status === "pending" ? "badge badge-pending" :
+                "badge badge-default";
+              item.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-
+  items:center;">
+                  <span style="font-weight:700;">${booking.client}</span>
+                  <span class="${badgeClass}">${booking.status}</span>
+                </div>
+                <div style="color: var(--slate-400); font-size: 0.85rem;">${booking.service}
+  </div>
+                <div style="color: var(--slate-500); font-size:
+  0.8rem;">${booking.startTime} - ${booking.endTime}</div>
+              `;
+              bookingList.appendChild(item);
+            });
+          };
+
+          const selectDate = (iso) => {
+            selectedIso = iso;
+            selectedLabel.textContent = DateUtils.display(iso);
+            renderCalendar();
+            renderBookings();
+          };
+
+          form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            if (!selectedIso) {
+              Toast.show("Select a date on the calendar before adding a booking.", "error");
+              return;
+            }
+            const formData = new FormData(form);
+            const client = String(formData.get("client") || "").trim();
+            const service = String(formData.get("service") || "").trim();
+            const startTime = String(formData.get("startTime") || "").trim();
+            const endTime = String(formData.get("endTime") || "").trim();
+            const status = String(formData.get("status") || "confirmed");
+            if (!client || !service) {
+              Toast.show("Client and service are required.", "error");
+              return;
+            }
+            if (endTime <= startTime) {
+              Toast.show("End time must be after start time.", "error");
+              return;
+            }
+            AppStore.addBooking({ date: selectedIso, client, service, startTime, endTime,
+  status });
+            form.reset();
+            renderCalendar();
+            renderBookings();
+            Dashboard.refresh();
+            Payments.refreshInvoiceOptions();
+            Reports.render();
+            Toast.show(`Booking added for ${DateUtils.display(selectedIso)}.`, "success");
+          });
+
+          prevBtn.addEventListener("click", () => {
+            activeDate = new Date(activeDate.getFullYear(), activeDate.getMonth() - 1, 1);
+            renderCalendar();
+          });
+
+          nextBtn.addEventListener("click", () => {
+            activeDate = new Date(activeDate.getFullYear(), activeDate.getMonth() + 1, 1);
+            renderCalendar();
+          });
+
+          document.getElementById("quick-add-booking").addEventListener("click", () => {
+            Tabs.show("bookings");
+            const today = DateUtils.todayIso();
+            const parsed = DateUtils.fromIso(today);
+            if (parsed) {
+              activeDate = parsed;
+              selectDate(today);
+            }
+            form.querySelector('input[name="client"]').focus();
+          });
+
+          return {
+            init() {
+              renderCalendar();
+            },
+            selectDate,
+          };
+        })();
+
+        const Payments = (() => {
+          const invoiceForm = document.getElementById("invoice-form");
+          const invoiceSelect = invoiceForm.querySelector('select[name="bookingId"]');
+          const invoiceTable = document.getElementById("invoice-table");
+          const invoiceEmpty = document.getElementById("invoice-empty");
+          const paymentsTable = document.getElementById("payments-table");
+          const paymentsEmpty = document.getElementById("payments-empty");
+          const paymentForm = document.getElementById("payment-form");
+
+          const refreshInvoiceOptions = () => {
+            const bookings = AppStore.getAllBookings();
+            invoiceSelect.innerHTML = "";
+            if (bookings.length === 0) {
+              const option = document.createElement("option");
+              option.textContent = "No bookings available";
+              option.value = "";
+              option.disabled = true;
+              invoiceSelect.appendChild(option);
+              invoiceSelect.disabled = true;
+              return;
+            }
+            invoiceSelect.disabled = false;
+            bookings.forEach((booking) => {
+              const option = document.createElement("option");
+              option.value = booking.id;
+              option.textContent = `${booking.client} — ${DateUtils.display(booking.date)}
+  (${booking.service})`;
+              invoiceSelect.appendChild(option);
+            });
+          };
+
+          const renderInvoices = () => {
+            const invoices = AppStore.getInvoices();
+            const bookings = new Map(AppStore.getAllBookings().map((booking) => [booking.id,
+  booking]));
+            invoiceTable.innerHTML = "";
+            if (invoices.length === 0) {
+              invoiceEmpty.classList.remove("hidden");
+            } else {
+              invoiceEmpty.classList.add("hidden");
+            }
+            invoices.forEach((invoice) => {
+              const row = document.createElement("tr");
+              const booking = bookings.get(invoice.bookingId);
+              row.innerHTML = `
+                <td>${invoice.number || "—"}</td>
+                <td>${booking ? booking.client : "Booking archived"}</td>
+                <td>$${Number(invoice.amount || 0).toFixed(2)}</td>
+                <td>
+                  <select data-id="${invoice.id}">
+                    <option value="draft" ${invoice.status === "draft" ? "selected" : ""}
+  >Draft</option>
+                    <option value="sent" ${invoice.status === "sent" ? "selected" : ""}
+  >Sent</option>
+                    <option value="paid" ${invoice.status === "paid" ? "selected" : ""}
+  >Paid</option>
+                    <option value="overdue" ${invoice.status === "overdue" ? "selected" :
+  ""}>Overdue</option>
+                  </select>
+                </td>
+                <td>${invoice.dueDate || "—"}</td>
+              `;
+              row.querySelector("select").addEventListener("change", (event) => {
+                AppStore.updateInvoiceStatus(event.target.dataset.id, event.target.value);
+                Dashboard.refresh();
+                Reports.render();
+                Toast.show("Invoice status updated.", "success", { duration: 2500 });
+              });
+              invoiceTable.appendChild(row);
+            });
+          };
+
+          const renderPayments = () => {
+            const payments = AppStore.getPayments();
+            paymentsTable.innerHTML = "";
+            if (payments.length === 0) {
+              paymentsEmpty.classList.remove("hidden");
+            } else {
+              paymentsEmpty.classList.add("hidden");
+            }
+            payments.forEach((payment) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${payment.date}</td>
+                <td>${payment.client}</td>
+                <td>$${Number(payment.amount || 0).toFixed(2)}</td>
+                <td>${payment.method}</td>
+                <td>${payment.reference || "—"}</td>
+              `;
+              paymentsTable.appendChild(row);
+            });
+          };
+
+          invoiceForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            if (invoiceSelect.disabled || !invoiceSelect.value) {
+              Toast.show("Select a booking before creating an invoice.", "error");
+              return;
+            }
+            const data = new FormData(invoiceForm);
+            const amount = Number(data.get("amount"));
+            const dueDate = String(data.get("dueDate"));
+            if (!Number.isFinite(amount) || amount <= 0) {
+              Toast.show("Invoice amount must be greater than zero.", "error");
+              return;
+            }
+            if (!DateUtils.fromIso(dueDate)) {
+              Toast.show("Provide a valid due date.", "error");
+              return;
+            }
+            AppStore.addInvoice({
+              bookingId: data.get("bookingId"),
+              amount,
+              dueDate,
+              number: `INV-${DateUtils.todayIso().replaceAll("-",
+  "")}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
+              status: "draft",
+            });
+            invoiceForm.reset();
+            refreshInvoiceOptions();
+            renderInvoices();
+            Dashboard.refresh();
+            Reports.render();
+            Toast.show("Invoice created.", "success");
+          });
+
+          paymentForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const data = new FormData(paymentForm);
+            const client = String(data.get("client") || "").trim();
+            const amount = Number(data.get("amount"));
+            if (!client) {
+              Toast.show("Client is required.", "error");
+              return;
+            }
+            if (!Number.isFinite(amount) || amount <= 0) {
+              Toast.show("Payment amount must be greater than zero.", "error");
+              return;
+            }
+            AppStore.addPayment({
+              date: DateUtils.todayIso(),
+              client,
+              amount,
+              method: String(data.get("method") || "Card"),
+              reference: String(data.get("reference") || "").trim(),
+            });
+            paymentForm.reset();
+            renderPayments();
+            Dashboard.refresh();
+            Reports.render();
+            Toast.show("Payment recorded.", "success");
+          });
+
+          document.getElementById("quick-add-payment").addEventListener("click", () => {
+            Tabs.show("payments");
+            paymentForm.querySelector('input[name="client"]').focus();
+          });
+
+          document.getElementById("generate-invoice").addEventListener("click", () => {
+            const invoices = AppStore.getInvoices();
+            if (invoices.length === 0) {
+              Toast.show("Create an invoice before exporting.", "warning");
+              return;
+            }
+            const settings = AppStore.settings;
+            const doc = [
+              `${settings.name} • Invoice Summary`,
+              `Generated: ${new Date().toLocaleString()}`,
+              "",
+              ...invoices.map((invoice) => {
+                const booking = AppStore.getAllBookings().find((item) => item.id ===
+  invoice.bookingId);
+                return `${invoice.number || "INV"} • ${booking ? booking.client : "Booking
+  archived"} • $${Number(invoice.amount || 0).toFixed(2)} • ${invoice.status?.toUpperCase()
+  || "DRAFT"} • Due ${invoice.dueDate || "—"}`;
+              }),
+            ].join("\n");
+            const blob = new Blob([doc], { type: "text/plain;charset=utf-8" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `${settings.name.replace(/\s+/g, "_").toLowerCase()}_invoice-
+  summary.txt`;
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(() => {
+              URL.revokeObjectURL(link.href);
+              link.remove();
+            }, 0);
+            Toast.show("Invoice summary exported.", "success");
+          });
+
+          document.querySelectorAll('[data-export]').forEach((button) => {
+            button.addEventListener("click", () => {
+              const type = button.dataset.export;
+              let records = [];
+              let schema = [];
+              if (type === "bookings") {
+                records = AppStore.getAllBookings();
+                schema = ["id", "date", "client", "service", "startTime", "endTime",
+  "status"];
+              } else if (type === "invoices") {
+                records = AppStore.getInvoices();
+                schema = ["id", "number", "bookingId", "amount", "status", "dueDate"];
+              } else if (type === "payments") {
+                records = AppStore.getPayments();
+                schema = ["id", "date", "client", "amount", "method", "reference"];
+              }
+              const header = schema.join(",");
+              const rows = records.map((record) =>
+                schema.map((key) => `"${String(record[key] ?? "").replaceAll('"',
+  '""')}"`).join(",")
+              );
+              const csv = [header, ...rows].join("\n");
+              const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+              const link = document.createElement("a");
+              link.href = URL.createObjectURL(blob);
+              link.download = `${type}_${DateUtils.todayIso().replaceAll("-", "")}.csv`;
+              document.body.appendChild(link);
+              link.click();
+              setTimeout(() => {
+                URL.revokeObjectURL(link.href);
+                link.remove();
+              }, 0);
+              Toast.show(`${type.charAt(0).toUpperCase() + type.slice(1)} exported.`,
+  "success");
+            });
+          });
+
+          return {
+            init() {
+              refreshInvoiceOptions();
+              renderInvoices();
+              renderPayments();
+            },
+            refreshInvoiceOptions,
+            renderInvoices,
+            renderPayments,
+          };
+        })();
+
+        const Reports = (() => {
+          const canvas = document.getElementById("revenue-chart");
+          const emptyState = document.getElementById("revenue-chart-empty");
+          const highlightsList = document.getElementById("report-highlights");
+          const highlightsEmpty = document.getElementById("report-empty");
+
+          const renderChart = (dataset) => {
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (dataset.length === 0) {
+              emptyState.classList.remove("hidden");
+              return;
+            }
+            emptyState.classList.add("hidden");
+            const padding = 40;
+            const width = canvas.width - padding * 2;
+            const height = canvas.height - padding * 2;
+            const max = Math.max(...dataset.map((item) => item.total), 1);
+            ctx.strokeStyle = "rgba(148,163,184,0.35)";
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, padding + height);
+            ctx.lineTo(padding + width, padding + height);
+            ctx.stroke();
+            ctx.strokeStyle = "rgba(59,130,246,0.8)";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            dataset.forEach((item, index) => {
+              const x = padding + (index / Math.max(dataset.length - 1, 1)) * width;
+              const y = padding + height - (item.total / max) * height;
+              if (index === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+            ctx.fillStyle = "rgba(59,130,246,1)";
+            dataset.forEach((item, index) => {
+              const x = padding + (index / Math.max(dataset.length - 1, 1)) * width;
+              const y = padding + height - (item.total / max) * height;
+              ctx.beginPath();
+              ctx.arc(x, y, 4, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.fillStyle = "#fff";
+              ctx.font = "12px Inter, sans-serif";
+              ctx.fillText(item.label, x - 20, padding + height + 18);
+              ctx.fillStyle = "rgba(59,130,246,1)";
+            });
+          };
+
+          const renderHighlights = (dataset) => {
+            highlightsList.innerHTML = "";
+            if (dataset.length === 0) {
+              highlightsEmpty.classList.remove("hidden");
+              return;
+            }
+            highlightsEmpty.classList.add("hidden");
+            const total = dataset.reduce((sum, item) => sum + item.total, 0);
+            const best = [...dataset].sort((a, b) => b.total - a.total)[0];
+            const worst = [...dataset].sort((a, b) => a.total - b.total)[0];
+            const entries = [
+              `Total revenue across ${dataset.length} months: $${total.toFixed(2)}`,
+              `Average monthly revenue: $${(total / dataset.length).toFixed(2)}`,
+              `Best month: ${best.label} with $${best.total.toFixed(2)}`,
+              `Lowest month: ${worst.label} with $${worst.total.toFixed(2)}`,
+            ];
+            entries.forEach((entry) => {
+              const li = document.createElement("li");
+              li.textContent = entry;
+              highlightsList.appendChild(li);
+            });
+          };
+
+          return {
+            render() {
+              const payments = AppStore.getPayments();
+              const grouped = new Map();
+              payments.forEach((payment) => {
+                const parsed = DateUtils.fromIso(payment.date);
+                if (!parsed) return;
+                const key = `${parsed.getFullYear()}-${String(parsed.getMonth() +
+  1).padStart(2, "0")}`;
+                const label = parsed.toLocaleDateString(undefined, { month: "short", year:
+  "numeric" });
+                if (!grouped.has(key)) grouped.set(key, { label, total: 0 });
+                grouped.get(key).total += Number(payment.amount || 0);
+              });
+              const dataset = Array.from(grouped.values()).sort((a, b) => new Date(a.label)
+  - new Date(b.label));
+              renderChart(dataset);
+              renderHighlights(dataset);
+            },
+          };
+        })();
+
+        const Settings = (() => {
+          const form = document.getElementById("settings-form");
+          const preview = {
+            name: document.getElementById("brand-preview-name"),
+            email: document.getElementById("brand-preview-email"),
+            phone: document.getElementById("brand-preview-phone"),
+            address: document.getElementById("brand-preview-address"),
+          };
+          const brandingTitle = document.getElementById("branding-title");
+
+          const applyPreview = (settings) => {
+            brandingTitle.textContent = `${settings.name} Console`;
+            preview.name.textContent = settings.name;
+            preview.email.textContent = settings.email;
+            preview.phone.textContent = settings.phone || "—";
+            preview.address.textContent = settings.address || "—";
+            document.documentElement.style.setProperty("--brand-accent", settings.color
+  || "#3b82f6");
+          };
+
+          form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const data = new FormData(form);
+            const updates = {
+              name: String(data.get("name") || "").trim(),
+              email: String(data.get("email") || "").trim(),
+              phone: String(data.get("phone") || "").trim(),
+              color: data.get("color") || "#3b82f6",
+              address: String(data.get("address") || "").trim(),
+            };
+            if (!updates.name || !updates.email) {
+              Toast.show("Name and email are required for branding.", "error");
+              return;
+            }
+            const updated = AppStore.updateSettings(updates);
+            applyPreview(updated);
+            Reports.render();
+            Toast.show("Brand settings saved.", "success");
+          });
+
+          return {
+            init() {
+              const settings = AppStore.settings;
+              form.name.value = settings.name;
+              form.email.value = settings.email;
+              form.phone.value = settings.phone;
+              form.color.value = settings.color;
+              form.address.value = settings.address;
+              applyPreview(settings);
+            },
+          };
+        })();
+
+        const Dashboard = (() => {
+          const summaryUpcoming = document.getElementById("summary-upcoming");
+          const summaryOpenInvoices = document.getElementById("summary-open-invoices");
+          const summaryMonthPayments = document.getElementById("summary-month-payments");
+          const notificationsList = document.getElementById("dashboard-notifications");
+          const emptyState = document.getElementById("dashboard-empty-state");
+
+          return {
+            refresh() {
+              const upcoming = AppStore.getUpcomingBookings();
+              const openInvoices = AppStore.getOpenInvoices();
+              const now = new Date();
+              const paymentsThisMonth = AppStore.getPaymentsForMonth(now.getFullYear(),
+  now.getMonth());
+              const totalPayments = paymentsThisMonth.reduce((sum, item) => sum +
+  Number(item.amount || 0), 0);
+
+              summaryUpcoming.textContent = upcoming.length;
+              summaryOpenInvoices.textContent = openInvoices.length;
+              summaryMonthPayments.textContent = `$${totalPayments.toFixed(2)}`;
+
+              notificationsList.innerHTML = "";
+              const notifications = [];
+
+              upcoming.forEach((booking) => {
+                notifications.push({
+                  tone: "info",
+                  text: `${booking.client} — ${booking.service} on
+  ${DateUtils.display(booking.date)} at ${booking.startTime}`,
+                });
+              });
+
+              openInvoices.forEach((invoice) => {
+                notifications.push({
+                  tone: invoice.status === "overdue" ? "warning" : "info",
+                  text: `${invoice.number || "Invoice"} is ${invoice.status?.toUpperCase()
+  || "PENDING"} and due ${invoice.dueDate || "soon"}`,
+                });
+              });
+
+              if (notifications.length === 0) {
+                emptyState.classList.remove("hidden");
+                return;
+              }
+
+              emptyState.classList.add("hidden");
+              notifications.forEach((notification) => {
+                const item = document.createElement("li");
+                item.innerHTML = `
+                  <div style="display:flex; gap:0.75rem;">
+                    <span style="margin-top:0.35rem; width:0.6rem; height:0.6rem; border-
+  radius:999px; background:${notification.tone === "warning" ? "var(--amber-400)" :
+  "var(--blue-400)"};"></span>
+                    <p style="margin:0;">${notification.text}</p>
+                  </div>
+                `;
+                notificationsList.appendChild(item);
+              });
+            },
+          };
+        })();
+
+        document.addEventListener("DOMContentLoaded", () => {
+          Tabs.show("dashboard");
+          Calendar.init();
+          Payments.init();
+          Settings.init();
+          Dashboard.refresh();
+          Reports.render();
+        });
+      })();
+    </script>
+  </body>
+  </html>
