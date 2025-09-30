@@ -62,13 +62,15 @@
         --slate-500: #64748b;
         --slate-400: #94a3b8;
         --slate-300: #cbd5f5;
-        --brand-primary: #4b0082;
-        --brand-primary-soft: #5f1aa6;
-        --brand-primary-rgb: 75, 0, 130;
-        --brand-accent: #a855f7;
-        --brand-accent-rgb: 168, 85, 247;
+        --brand-primary: #4c1d95;
+        --brand-primary-soft: #5b21b6;
+        --brand-primary-rgb: 76, 29, 149;
+        --brand-accent: #8b5cf6;
+        --brand-accent-rgb: 139, 92, 246;
         --emerald-400: #34d399;
         --amber-400: #fbbf24;
+        --sky-400: #38bdf8;
+        --rose-400: #fb7185;
         --white: #ffffff;
       }
       * {
@@ -207,21 +209,25 @@
         border-radius: 0.75rem;
         padding: 0.5rem 1rem;
         font-weight: 600;
-        transition: background 0.2s ease, transform 0.15s ease;
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        background: rgba(15, 23, 42, 0.85);
+        transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+        border: 1px solid rgba(var(--brand-primary-rgb), 0.45);
+        background: rgba(var(--brand-primary-rgb), 0.16);
+        color: var(--slate-100);
       }
       .btn:hover {
         transform: translateY(-1px);
-        background: rgba(15, 23, 42, 0.95);
+        background: rgba(var(--brand-primary-rgb), 0.25);
+        box-shadow: 0 10px 24px rgba(var(--brand-primary-rgb), 0.35);
       }
       .btn-primary {
-        background: var(--brand-primary);
+        background: linear-gradient(135deg, rgba(var(--brand-primary-rgb), 0.95), rgba(var(--brand-primary-rgb), 0.7));
         color: var(--white);
         border: none;
+        box-shadow: 0 14px 32px rgba(var(--brand-primary-rgb), 0.45);
       }
       .btn-primary:hover {
-        background: var(--brand-primary-soft);
+        background: linear-gradient(135deg, rgba(var(--brand-primary-rgb), 1), rgba(var(--brand-primary-rgb), 0.85));
+        box-shadow: 0 18px 36px rgba(var(--brand-primary-rgb), 0.55);
       }
       .btn-ghost {
         padding: 0.35rem 0.6rem;
@@ -230,8 +236,8 @@
         background: transparent;
       }
       .btn-ghost:hover {
-        border-color: rgba(148, 163, 184, 0.35);
-        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(var(--brand-primary-rgb), 0.35);
+        background: rgba(var(--brand-primary-rgb), 0.12);
       }
       .btn-sm {
         padding: 0.35rem 0.6rem;
@@ -352,9 +358,19 @@
         padding: 0;
         margin: 0;
         display: flex;
-        border: 1px solid rgba(148, 163, 184, 0.15);
+        border: 1px solid rgba(var(--brand-primary-rgb), 0.35);
         border-radius: 0.75rem;
-        overflow: hidden;
+        overflow-x: auto;
+        overflow-y: hidden;
+        background: rgba(15, 23, 42, 0.7);
+        box-shadow: inset 0 0 0 1px rgba(var(--brand-primary-rgb), 0.08);
+      }
+      nav ul::-webkit-scrollbar {
+        height: 6px;
+      }
+      nav ul::-webkit-scrollbar-thumb {
+        background: rgba(var(--brand-primary-rgb), 0.45);
+        border-radius: 999px;
       }
       nav li {
         flex: 1 1 0;
@@ -364,20 +380,48 @@
         padding: 0.75rem 1rem;
         text-align: center;
         font-weight: 600;
-        background: rgba(15, 23, 42, 0.6);
-        transition: background 0.2s ease;
-      }
-      nav button:hover {
         background: rgba(var(--brand-primary-rgb), 0.12);
+        transition: background 0.2s ease, box-shadow 0.2s ease;
+        border-right: 1px solid rgba(var(--brand-primary-rgb), 0.2);
+        min-width: 160px;
+      }
+      nav li:last-child button {
+        border-right: none;
+      }
+      nav button:hover,
+      nav button:focus-visible {
+        background: rgba(var(--brand-primary-rgb), 0.2);
       }
       nav button.active {
-        background: rgba(var(--brand-primary-rgb), 0.15);
-        color: var(--slate-100);
+        background: linear-gradient(135deg, rgba(var(--brand-primary-rgb), 0.95), rgba(var(--brand-primary-rgb), 0.7));
+        color: var(--white);
+        box-shadow: 0 12px 28px rgba(var(--brand-primary-rgb), 0.45);
       }
       .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
         gap: 0.5rem;
+        min-width: 520px;
+      }
+      .calendar-wrapper {
+        margin-top: 0.75rem;
+        display: grid;
+        gap: 0.5rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        -webkit-overflow-scrolling: touch;
+      }
+      .calendar-wrapper::-webkit-scrollbar {
+        height: 8px;
+      }
+      .calendar-wrapper::-webkit-scrollbar-thumb {
+        background: rgba(var(--brand-primary-rgb), 0.45);
+        border-radius: 999px;
+      }
+      .calendar-weekdays {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
       }
       .calendar-cell {
         position: relative;
@@ -390,10 +434,16 @@
         display: grid;
         gap: 0.35rem;
         align-content: start;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+      .calendar-cell:hover {
+        border-color: rgba(var(--brand-primary-rgb), 0.35);
+        box-shadow: inset 0 0 0 1px rgba(var(--brand-primary-rgb), 0.2);
       }
       .calendar-cell.active {
-        border-color: var(--brand-accent);
-        background: rgba(var(--brand-accent-rgb), 0.18);
+        border-color: rgba(var(--brand-primary-rgb), 0.65);
+        background: rgba(var(--brand-primary-rgb), 0.22);
+        box-shadow: inset 0 0 0 1px rgba(var(--brand-primary-rgb), 0.35);
       }
       .badge {
         padding: 0.2rem 0.5rem;
@@ -452,31 +502,44 @@
         pointer-events: none;
       }
       .toast {
-        background: rgba(15, 23, 42, 0.95);
-        border: 1px solid rgba(148, 163, 184, 0.25);
         border-radius: 0.9rem;
         padding: 0.85rem 1rem;
-        box-shadow: 0 20px 45px rgba(2, 6, 23, 0.5);
+        box-shadow: 0 22px 48px rgba(2, 6, 23, 0.6);
         opacity: 0;
         transform: translateY(-10px);
         transition: opacity 0.2s ease, transform 0.2s ease;
         pointer-events: auto;
+        border: 1px solid transparent;
+        border-left: 4px solid transparent;
+        background: rgba(15, 23, 42, 0.96);
+        display: grid;
+        gap: 0.35rem;
+        min-width: 240px;
+        cursor: pointer;
       }
       .toast.visible {
         opacity: 1;
         transform: translateY(0);
       }
       .toast[data-tone="success"] {
-        border-color: rgba(16, 185, 129, 0.5);
+        border-color: rgba(34, 197, 94, 0.35);
+        border-left-color: rgba(34, 197, 94, 0.85);
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.16), rgba(15, 23, 42, 0.96));
       }
       .toast[data-tone="error"] {
-        border-color: rgba(244, 63, 94, 0.5);
+        border-color: rgba(var(--rose-400), 0.4);
+        border-left-color: var(--rose-400);
+        background: linear-gradient(135deg, rgba(251, 113, 133, 0.2), rgba(15, 23, 42, 0.96));
       }
       .toast[data-tone="warning"] {
-        border-color: rgba(251, 191, 36, 0.5);
+        border-color: rgba(var(--amber-400), 0.4);
+        border-left-color: var(--amber-400);
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.18), rgba(15, 23, 42, 0.96));
       }
       .toast[data-tone="info"] {
-        border-color: rgba(var(--brand-accent-rgb), 0.5);
+        border-color: rgba(var(--sky-400), 0.45);
+        border-left-color: var(--sky-400);
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(15, 23, 42, 0.96));
       }
       .notification-item {
         display: flex;
@@ -541,6 +604,24 @@
       .auth-subtext {
         margin: 0;
       }
+      @media (max-width: 900px) {
+        .app-header .grid-2 {
+          grid-template-columns: 1fr;
+        }
+        .header-brand {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.75rem;
+        }
+        .header-actions {
+          width: 100%;
+          justify-content: flex-start;
+          gap: 0.5rem;
+        }
+        .header-actions .btn {
+          flex: 1 1 auto;
+        }
+      }
       @media (max-width: 600px) {
         .grid-2,
         .grid-3 {
@@ -548,6 +629,27 @@
         }
         nav ul {
           flex-direction: column;
+          overflow-x: visible;
+        }
+        nav button {
+          min-width: 100%;
+          border-right: none;
+        }
+        nav li + li button {
+          border-top: 1px solid rgba(var(--brand-primary-rgb), 0.2);
+        }
+        .toast-region {
+          left: 50%;
+          right: auto;
+          transform: translateX(-50%);
+          width: min(90vw, 22rem);
+        }
+        .toast {
+          min-width: auto;
+          width: 100%;
+        }
+        .app-shell {
+          padding: 1.75rem 1rem 3.25rem;
         }
         .header-actions {
           justify-content: flex-start;
@@ -559,6 +661,9 @@
         }
         .grid-3 {
           grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .calendar-grid {
+          min-width: 0;
         }
       }
     </style>
@@ -777,16 +882,18 @@
                   </button>
                 </div>
               </div>
-              <div class="calendar-grid mt-1 text-subtle text-small" aria-label="Calendar weekdays">
-                <div class="text-center">Sun</div>
-                <div class="text-center">Mon</div>
-                <div class="text-center">Tue</div>
-                <div class="text-center">Wed</div>
-                <div class="text-center">Thu</div>
-                <div class="text-center">Fri</div>
-                <div class="text-center">Sat</div>
+              <div class="calendar-wrapper">
+                <div class="calendar-grid calendar-weekdays text-subtle text-small" aria-label="Calendar weekdays">
+                  <div class="text-center">Sun</div>
+                  <div class="text-center">Mon</div>
+                  <div class="text-center">Tue</div>
+                  <div class="text-center">Wed</div>
+                  <div class="text-center">Thu</div>
+                  <div class="text-center">Fri</div>
+                  <div class="text-center">Sat</div>
+                </div>
+                <div id="calendar-grid" class="calendar-grid" aria-live="polite"></div>
               </div>
-              <div id="calendar-grid" class="calendar-grid mt-1" aria-live="polite"></div>
             </div>
 
             <div class="card grid gap-md">
@@ -1181,7 +1288,8 @@
         const Toast = (() => {
           const region = document.getElementById("toast-region");
           const timers = new WeakMap();
-          const maxVisible = 4;
+          const maxVisible = 6;
+          const allowedTones = new Set(["success", "error", "warning", "info"]);
 
           const removeToast = (toast) => {
             if (!toast) return;
@@ -1197,24 +1305,31 @@
           };
 
           const queueRemoval = (toast, duration) => {
-            const hideTimer = window.setTimeout(() => removeToast(toast), Math.max(duration, 1600));
+            const hideTimer = window.setTimeout(() => removeToast(toast), Math.max(duration, 2000));
             timers.set(toast, { hideTimer, removeTimer: null });
           };
 
           const show = (message, tone = "info", options = {}) => {
-            if (!region || !message) return;
+            if (!region) return;
+            const text = typeof message === "string" ? message.trim() : String(message ?? "").trim();
+            if (!text) return;
+            const resolvedTone = allowedTones.has(tone) ? tone : "info";
             const toast = document.createElement("div");
             toast.className = "toast";
-            toast.dataset.tone = tone;
+            toast.dataset.tone = resolvedTone;
             toast.setAttribute("role", "alert");
-            toast.textContent = message;
+            toast.textContent = text;
             if (region.children.length >= maxVisible) {
-              removeToast(region.firstElementChild);
+              removeToast(region.lastElementChild);
             }
-            region.appendChild(toast);
+            region.prepend(toast);
             requestAnimationFrame(() => toast.classList.add("visible"));
-            const duration = Number.isFinite(options.duration) ? options.duration : 4000;
-            queueRemoval(toast, duration);
+            const duration = Number.isFinite(options.duration) ? options.duration : 5000;
+            if (duration !== Infinity) {
+              queueRemoval(toast, duration);
+            } else {
+              timers.set(toast, { hideTimer: null, removeTimer: null });
+            }
             toast.addEventListener("click", () => removeToast(toast));
           };
 
@@ -1222,7 +1337,7 @@
         })();
 
         const Theme = (() => {
-          const FALLBACK = "#a855f7";
+          const FALLBACK = "#8b5cf6";
           const normalize = (value) => {
             if (typeof value !== "string") return FALLBACK;
             const trimmed = value.trim();
@@ -1286,7 +1401,7 @@
             name: "Zantra Studios",
             email: "team@zantra.com",
             phone: "+1 (555) 123-4567",
-            color: "#a855f7",
+            color: "#8b5cf6",
             address: "123 Market Street, Suite 400, San Francisco, CA",
             updatedAt: new Date().toISOString(),
             dirty: false,
@@ -1954,18 +2069,11 @@
             const endField = document.getElementById("booking-end");
             if (!startField || !endField) return;
             const selectedDate = DateUtils.fromIso(selectedIso) || new Date();
-            const slot = new Date();
-            slot.setFullYear(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-            slot.setSeconds(0, 0);
-            const minutes = slot.getMinutes();
-            const remainder = minutes % 30;
-            if (remainder !== 0) {
-              slot.setMinutes(minutes + (30 - remainder));
-            }
-            const start = new Date(slot);
-            const end = new Date(start.getTime() + 60 * 60 * 1000);
-            const format = (date) =>
-              `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+            const start = new Date(selectedDate);
+            start.setHours(9, 0, 0, 0);
+            const end = new Date(selectedDate);
+            end.setHours(10, 0, 0, 0);
+            const format = (date) => `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
             if (force || !startField.value) startField.value = format(start);
             if (force || !endField.value) endField.value = format(end);
           };
@@ -2105,7 +2213,9 @@
             });
           };
 
-          const selectDate = (iso) => {
+          const selectDate = (iso, options = {}) => {
+            if (!iso) return;
+            const previousIso = selectedIso;
             selectedIso = iso;
             selectedLabel.textContent = DateUtils.display(iso);
             if (editingId) {
@@ -2116,7 +2226,10 @@
             }
             renderCalendar();
             renderBookings();
-            setDefaultBookingTimes();
+            const shouldForce = Boolean(options.forceTimes) || previousIso !== iso;
+            if (!editingId) {
+              setDefaultBookingTimes(shouldForce);
+            }
           };
 
           form.addEventListener("submit", async (event) => {
@@ -2194,15 +2307,25 @@
             const parsed = DateUtils.fromIso(today);
             if (parsed) {
               activeDate = parsed;
-              selectDate(today);
+              selectDate(today, { forceTimes: true });
+            } else {
+              setDefaultBookingTimes(true);
             }
             document.getElementById("booking-client").focus();
-            setDefaultBookingTimes(true);
           });
 
           return {
             init() {
-              renderCalendar();
+              const todayIso = DateUtils.todayIso();
+              const parsedToday = DateUtils.fromIso(todayIso);
+              if (parsedToday) {
+                activeDate = parsedToday;
+                selectDate(todayIso, { forceTimes: true });
+              } else {
+                renderCalendar();
+                renderBookings();
+                setDefaultBookingTimes(true);
+              }
             },
             selectDate,
             resetFormState,
