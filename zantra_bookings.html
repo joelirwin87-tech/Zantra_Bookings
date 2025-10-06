@@ -23,11 +23,10 @@
         --spacing-2: 1rem;
         --spacing-3: 1.5rem;
         --spacing-4: 2rem;
-        --card-radius: 8px;
-        --card-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
-        --card-padding: 18px;
-        --button-font-size: 0.95rem;
-        --button-min-height: 38px;
+        --card-radius: 1rem;
+        --card-shadow: 0 20px 40px rgba(76, 29, 149, 0.08);
+        --card-padding: 2rem;
+        --button-font-size: 1.125rem;
       }
       *,
       *::before,
@@ -52,15 +51,16 @@
         line-height: 1.35;
       }
       h1 {
-        font-size: 1.35rem;
-        font-weight: 600;
+        font-size: 1.375rem;
+        font-weight: 700;
       }
       h2 {
         font-size: 1.125rem;
+        font-weight: 600;
       }
       h3 {
         font-size: 1rem;
-        font-weight: 500;
+        font-weight: 600;
       }
       a {
         color: var(--brand-primary);
@@ -318,12 +318,12 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-height: var(--button-min-height);
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
+        min-height: 44px;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
         font-weight: 600;
         font-size: var(--button-font-size);
-        line-height: 1.3;
+        line-height: 1.2;
         border: 1px solid transparent;
         cursor: pointer;
         transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
@@ -380,7 +380,7 @@
         width: 100%;
         min-height: 50px;
         padding: 0.75rem 1rem;
-        border-radius: 0.5rem;
+        border-radius: 0.75rem;
         border: 1px solid #d1d5db;
         background: #fff;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -398,20 +398,18 @@
       }
       th,
       td {
-        padding: 0.75rem 0.85rem;
+        padding: 1rem;
         border-right: 1px solid rgba(148, 163, 184, 0.25);
         border-bottom: 1px solid rgba(148, 163, 184, 0.25);
         text-align: left;
         font-weight: 400;
       }
       th {
-        background: #f8fafc;
+        background: #f3f4f6;
         color: var(--text-muted);
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
-        font-size: 0.75rem;
-        border-bottom: 2px solid rgba(76, 29, 149, 0.35);
+        letter-spacing: 0.04em;
       }
       th:last-child,
       td:last-child {
@@ -446,26 +444,24 @@
         }
       }
       header {
-        background: #2a1660;
-        color: #f8fafc;
-        padding: 1.5rem 0;
-        border-bottom: none;
-        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+        background: #fff;
+        color: var(--brand-text);
+        padding: 2rem 0;
+        border-bottom: 1px solid var(--surface-border);
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.04);
       }
       header .section-subtext {
-        color: rgba(226, 232, 240, 0.85);
+        color: var(--text-soft);
       }
       nav {
         border-bottom: none;
-        padding: 0.5rem;
-        background: rgba(15, 15, 35, 0.45);
-        border-radius: 0.75rem;
+        padding-bottom: 0;
       }
       nav button {
         background: transparent;
         border: none;
-        padding: 0.35rem 1rem;
-        color: rgba(255, 255, 255, 0.72);
+        padding: 0.5rem 1rem;
+        color: rgba(255, 255, 255, 0.82);
         cursor: pointer;
         font-weight: 500;
         font-size: 0.95rem;
@@ -476,15 +472,15 @@
       }
       nav button:hover,
       nav button:focus-visible {
-        color: #fff;
+        color: var(--brand-primary);
         outline: none;
       }
       nav button:focus-visible {
-        box-shadow: inset 0 -3px 0 0 rgba(255, 255, 255, 0.35);
+        box-shadow: inset 0 -3px 0 0 rgba(76, 29, 149, 0.2);
       }
       nav button.active {
-        color: #fff;
-        border-bottom-color: rgba(255, 255, 255, 0.9);
+        color: var(--brand-primary);
+        border-bottom-color: var(--brand-primary);
       }
       .card,
       .timeline-card,
@@ -493,10 +489,8 @@
       .kpi-card {
         background: #fff;
         border-radius: var(--card-radius);
-        border: 1px solid rgba(148, 163, 184, 0.22);
+        border: 1px solid var(--surface-border);
         box-shadow: var(--card-shadow);
-      }
-      .card {
         padding: var(--card-padding);
       }
       .tab-content {
@@ -544,7 +538,6 @@
         width: min(520px, 100%);
         background: #fff;
         border-radius: 1rem;
-        border: 1px solid rgba(148, 163, 184, 0.25);
         box-shadow: 0 28px 56px rgba(15, 23, 42, 0.24);
         position: relative;
         overflow: hidden;
@@ -626,8 +619,8 @@
         border-radius: 999px;
         font-size: 0.75rem;
         font-weight: 500;
-        background: rgba(255, 255, 255, 0.18);
-        color: #f8fafc;
+        background: rgba(76, 29, 149, 0.08);
+        color: var(--brand-primary);
       }
       .link {
         color: var(--brand-primary);
@@ -646,9 +639,9 @@
         gap: 1rem;
       }
       .list-item {
-        border: 1px solid rgba(148, 163, 184, 0.25);
+        border: 1px solid var(--surface-border);
         border-radius: var(--card-radius);
-        padding: var(--card-padding);
+        padding: 1.5rem;
         display: flex;
         flex-direction: column;
         gap: 1rem;
@@ -672,7 +665,7 @@
         width: 100%;
         min-height: 140px;
         padding: 0.75rem 1rem;
-        border-radius: 0.5rem;
+        border-radius: 0.75rem;
         border: 1px solid #d1d5db;
         resize: vertical;
       }
@@ -756,8 +749,8 @@
         width: 48px;
         height: 48px;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.16);
-        border: 1px solid rgba(255, 255, 255, 0.32);
+        background: #ede9fe;
+        border: 1px solid rgba(76, 29, 149, 0.15);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -809,7 +802,7 @@
       .license-info {
         background: rgba(76, 29, 149, 0.07);
         border-radius: var(--card-radius);
-        padding: var(--card-padding);
+        padding: 1rem;
         margin-bottom: 1rem;
         color: #4338ca;
         font-weight: 500;
@@ -818,7 +811,7 @@
         border: 1px solid rgba(220, 38, 38, 0.35);
         background: rgba(220, 38, 38, 0.08);
         border-radius: var(--card-radius);
-        padding: var(--card-padding);
+        padding: 1.5rem;
       }
       .danger-zone h3 {
         color: var(--brand-danger);
@@ -851,17 +844,31 @@
         left: -1.75rem;
         top: 0.65rem;
       }
-      .timeline-card,
+      .timeline-card {
+        background: #fff;
+        border-radius: var(--card-radius);
+        border: 1px solid var(--surface-border);
+        box-shadow: var(--card-shadow);
+        padding: 1.25rem 1.5rem;
+      }
       .nested-card {
-        padding: var(--card-padding);
+        background: #fff;
+        border-radius: var(--card-radius);
+        border: 1px solid var(--surface-border);
+        box-shadow: var(--card-shadow);
+        padding: 1.25rem 1.5rem;
       }
       .mini-card {
-        padding: var(--card-padding);
-        display: grid;
-        grid-auto-rows: auto;
-        align-content: space-between;
-        gap: 0.5rem;
-        min-height: 120px;
+        background: #fff;
+        border-radius: var(--card-radius);
+        border: 1px solid var(--surface-border);
+        box-shadow: var(--card-shadow);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-height: 150px;
+        justify-content: center;
       }
       .overflow-auto {
         overflow: auto;
@@ -870,7 +877,7 @@
         text-wrap: balance;
       }
       .sticky-footer {
-        margin-top: 2rem;
+        margin-top: 3rem;
         padding: 1.5rem 0;
         text-align: center;
         font-size: 0.95rem;
@@ -885,14 +892,14 @@
       }
       .action-bar .btn {
         flex: 0 0 auto;
-        min-width: 128px;
+        min-width: 140px;
       }
       .action-bar.compact .btn {
         flex: 0 0 auto;
       }
       .empty-state-card {
         background: #f8fafc;
-        border: 1px solid rgba(148, 163, 184, 0.3);
+        border: 1px solid rgba(148, 163, 184, 0.35);
         border-radius: var(--card-radius);
         padding: var(--card-padding);
         text-align: center;
@@ -901,7 +908,7 @@
         display: grid;
         place-items: center;
         gap: 0.5rem;
-        min-height: 140px;
+        min-height: 160px;
       }
       .empty-state-card::before {
         content: attr(data-icon);
@@ -911,8 +918,8 @@
       .metrics-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.25rem;
-        grid-auto-rows: minmax(140px, 1fr);
+        gap: 1.5rem;
+        grid-auto-rows: minmax(160px, 1fr);
       }
       .chart-panel {
         position: relative;
@@ -932,8 +939,8 @@
       .kpi-panel {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.25rem;
-        grid-auto-rows: minmax(140px, 1fr);
+        gap: 1.5rem;
+        grid-auto-rows: minmax(160px, 1fr);
       }
       .kpi-card {
         padding: var(--card-padding);
@@ -941,6 +948,62 @@
         gap: 0.5rem;
         min-height: 160px;
         align-content: center;
+      }
+      .action-bar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .action-bar .btn {
+        flex: 1 1 180px;
+      }
+      .action-bar.compact .btn {
+        flex: 0 0 auto;
+      }
+      .empty-state-card {
+        background: #f8fafc;
+        border: 1px solid var(--surface-border);
+        border-radius: var(--card-radius);
+        padding: 1.5rem;
+        text-align: center;
+        color: var(--text-soft);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+      }
+      .chart-panel {
+        position: relative;
+        min-height: 320px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .chart-panel canvas {
+        width: 100%;
+        height: 320px;
+      }
+      .chart-panel .empty-state-card {
+        position: absolute;
+        inset: 0;
+      }
+      .kpi-panel {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+      }
+      .kpi-card {
+        background: #fff;
+        border-radius: var(--card-radius);
+        border: 1px solid var(--surface-border);
+        box-shadow: var(--card-shadow);
+        padding: 1.5rem;
       }
     </style>
   </head>
@@ -1276,9 +1339,7 @@
             <p class="section-subtext">Track paid amounts over the last 12 months.</p>
             <div class="chart-panel">
               <canvas id="revenueChart" height="320" role="img" aria-label="Monthly revenue chart"></canvas>
-              <div id="revenueEmptyState" class="empty-state-card hidden" data-icon="💳">
-                No payments recorded yet.
-              </div>
+              <div id="revenueEmptyState" class="empty-state-card hidden">No payments recorded yet.</div>
             </div>
           </div>
           <div class="card">
@@ -1286,9 +1347,7 @@
             <p class="section-subtext">Booking volume across the last 12 months.</p>
             <div class="chart-panel">
               <canvas id="bookingsChart" height="320" role="img" aria-label="Monthly bookings chart"></canvas>
-              <div id="bookingsEmptyState" class="empty-state-card hidden" data-icon="🗂">
-                No bookings captured yet.
-              </div>
+              <div id="bookingsEmptyState" class="empty-state-card hidden">No bookings captured yet.</div>
             </div>
           </div>
         </div>
@@ -1472,7 +1531,7 @@
           const barSpace = chartWidth / values.length;
           const barWidth = barSpace * 0.6;
           const axisColor = 'rgba(148, 163, 184, 0.35)';
-          const gridColor = 'rgba(148, 163, 184, 0.18)';
+          const gridColor = 'rgba(148, 163, 184, 0.2)';
           context.strokeStyle = axisColor;
           context.lineWidth = 1;
           context.beginPath();
@@ -1492,36 +1551,7 @@
             typeof dataset.formatValue === 'function'
               ? dataset.formatValue
               : (value) => value;
-          const formatAxis =
-            typeof dataset.formatAxis === 'function'
-              ? dataset.formatAxis
-              : (value) => value;
-          const tickCount = 4;
-          context.strokeStyle = axisColor;
-          context.fillStyle = '#94a3b8';
-          context.font = '11px Arial';
-          context.textAlign = 'right';
-          context.textBaseline = 'middle';
-          for (let i = 0; i <= tickCount; i += 1) {
-            const value = (maxValue / tickCount) * i;
-            const y = padding + chartHeight - chartHeight * (i / tickCount);
-            context.beginPath();
-            context.moveTo(padding - 6, y);
-            context.lineTo(padding, y);
-            context.stroke();
-            if (i > 0 && i < tickCount) {
-              context.strokeStyle = gridColor;
-              context.beginPath();
-              context.moveTo(padding, y);
-              context.lineTo(padding + chartWidth, y);
-              context.stroke();
-              context.strokeStyle = axisColor;
-            }
-            const axisLabel = formatAxis(value);
-            context.fillText(axisLabel, padding - 12, y);
-          }
           context.textAlign = 'center';
-          context.textBaseline = 'alphabetic';
           values.forEach((value, index) => {
             const ratio = value / maxValue;
             const barHeight = Math.max(ratio * (chartHeight - 24), 4);
@@ -1531,11 +1561,11 @@
             context.beginPath();
             context.roundRect(x, y, barWidth, barHeight, 8);
             context.fill();
-            context.fillStyle = '#94a3b8';
-            context.font = '11px Arial';
-            context.fillText(labels[index], x + barWidth / 2, padding + chartHeight + 18);
-            context.fillStyle = dataset.valueColor || '#4c1d95';
-            context.font = '11px Arial';
+            context.fillStyle = '#1f2937';
+            context.font = '16px Arial';
+            context.fillText(labels[index], x + barWidth / 2, padding + chartHeight + 20);
+            context.fillStyle = dataset.valueColor || '#0f172a';
+            context.font = '14px Arial';
             const valueLabel = String(formatValue(value));
             context.fillText(valueLabel, x + barWidth / 2, y - 8);
           });
@@ -1889,8 +1919,7 @@
           .sort((a, b) => new Date(a.date) - new Date(b.date));
         if (!bookings.length) {
           const emptyRow = document.createElement('tr');
-          emptyRow.innerHTML =
-            '<td colspan="5"><div class="empty-state-card" data-icon="🗂">No bookings scheduled yet.</div></td>';
+          emptyRow.innerHTML = '<td colspan="5"><div class="empty-state-card">No bookings scheduled yet.</div></td>';
           tbody.appendChild(emptyRow);
         } else {
           bookings.forEach((booking) => {
@@ -1927,7 +1956,6 @@
         if (!invoices.length) {
           const empty = document.createElement('div');
           empty.className = 'empty-state-card';
-          empty.setAttribute('data-icon', '📄');
           empty.textContent = 'No invoices created yet.';
           list.appendChild(empty);
           document.getElementById('invoiceCountLabel').textContent = '0 Invoices';
@@ -1986,7 +2014,7 @@
                           `
                         )
                         .join('')
-                    : '<li class="empty-state-card" data-icon="💳">No payments recorded yet.</li>'
+                    : '<li class="empty-state-card">No payments recorded yet.</li>'
                 }
               </ul>
             </div>
@@ -2003,7 +2031,6 @@
         if (!entries.length) {
           const empty = document.createElement('div');
           empty.className = 'empty-state-card';
-          empty.setAttribute('data-icon', '🗂');
           empty.textContent = 'No activity yet.';
           container.appendChild(empty);
           return;
@@ -2029,7 +2056,6 @@
         if (!entries.length) {
           const empty = document.createElement('div');
           empty.className = 'empty-state-card';
-          empty.setAttribute('data-icon', '📄');
           empty.textContent = 'No audit entries logged yet.';
           container.appendChild(empty);
           return;
@@ -2132,12 +2158,11 @@
         const dataset = {
           data: dataPoints,
           formatValue: (value) => `$${value.toFixed(2)}`,
-          formatAxis: (value) => `$${value.toFixed(0)}`,
           gradientStops: [
             { offset: 0, color: 'rgba(76,29,149,0.9)' },
             { offset: 1, color: 'rgba(124,58,237,0.6)' },
           ],
-          valueColor: '#4c1d95',
+          valueColor: '#1f2937',
         };
         if (state.revenueChart) {
           state.revenueChart.update({ data: { labels, datasets: [dataset] } });
@@ -2180,7 +2205,6 @@
         const dataset = {
           data: dataPoints,
           formatValue: (value) => `${value}`,
-          formatAxis: (value) => `${Math.round(value)}`,
           gradientStops: [
             { offset: 0, color: 'rgba(124,58,237,0.85)' },
             { offset: 1, color: 'rgba(167,139,250,0.55)' },
