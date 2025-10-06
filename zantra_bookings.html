@@ -824,44 +824,6 @@
         font-size: 0.9rem;
         color: var(--text-soft);
       }
-      /* Normalize all buttons */
-      .btn,
-      .btn-primary,
-      .btn-secondary,
-      .btn-outline,
-      .btn-danger {
-        min-height: 44px;
-        padding: 0.75rem 1.25rem;
-        font-size: 1rem;
-        font-weight: 500;
-        border-radius: 0.5rem;
-        line-height: 1.2;
-      }
-
-      /* Remove extreme shrinking for small buttons */
-      .btn-sm {
-        min-height: 40px;
-        padding: 0.6rem 1rem;
-        font-size: 0.95rem;
-      }
-
-      /* Ensure flex alignment in action bars */
-      .card .flex button,
-      .card .action-bar button {
-        flex: none;
-      }
-
-      /* Consistent action bar */
-      .action-bar {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        align-items: center;
-      }
-
-      .form-grid .action-bar {
-        grid-column: 1 / -1;
-      }
     </style>
   </head>
   <body>
@@ -1013,7 +975,7 @@
             <div class="avatar" id="userAvatar" aria-hidden="true">ZB</div>
             <div>
               <p class="text-sm" id="activeUserLabel">Offline Mode</p>
-              <button id="logoutButton" class="btn btn-secondary">Logout</button>
+              <button id="logoutButton" class="btn btn-secondary btn-sm">Logout</button>
             </div>
           </div>
         </div>
