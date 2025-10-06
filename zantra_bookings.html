@@ -105,6 +105,17 @@
         border: none;
         background: none;
       }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
       input,
       select,
       textarea {
@@ -1411,6 +1422,235 @@
           throw new Error("Zantra core utilities failed to load.");
         }
         const { safeClone, DateUtils, TextUtils, Toast, Theme } = core;
+
+        const LicenseManager = (() => {
+          const STORAGE_KEY = "zantra_license";
+          const LICENSE_DURATION_MS = 365 * 24 * 60 * 60 * 1000;
+          const VALID_CODES = new Set(["ZANTRA-2025"]);
+          const ERROR_COLOR = "#f87171";
+          const INFO_COLOR = "#94a3b8";
+          const SUCCESS_COLOR = "#34d399";
+
+          const canUseStorage = () => {
+            try {
+              return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+            } catch (error) {
+              console.error("License storage unavailable", error);
+              return false;
+            }
+          };
+
+          const readStoredLicense = () => {
+            if (!canUseStorage()) return null;
+            try {
+              const raw = window.localStorage.getItem(STORAGE_KEY);
+              if (!raw) return null;
+              const parsed = JSON.parse(raw);
+              if (!parsed || typeof parsed !== "object") return null;
+              return parsed;
+            } catch (error) {
+              console.error("Failed to parse stored license", error);
+              return null;
+            }
+          };
+
+          const persistActivation = (activationDate) => {
+            if (!canUseStorage()) {
+              return { success: false, reason: "storage" };
+            }
+            try {
+              const activationIso = activationDate.toISOString();
+              const expiresIso = new Date(activationDate.getTime() + LICENSE_DURATION_MS).toISOString();
+              window.localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify({ activationDate: activationIso, expiresAt: expiresIso })
+              );
+              return { success: true };
+            } catch (error) {
+              console.error("Failed to persist license", error);
+              return { success: false, reason: "storage" };
+            }
+          };
+
+          const isLicenseValid = () => {
+            const stored = readStoredLicense();
+            if (!stored?.activationDate) return false;
+            const activation = new Date(stored.activationDate);
+            if (Number.isNaN(activation.getTime())) return false;
+            const now = Date.now();
+            return now - activation.getTime() < LICENSE_DURATION_MS;
+          };
+
+          const activate = (code) => {
+            if (!code || typeof code !== "string") {
+              return { success: false, reason: "invalid" };
+            }
+            const sanitized = code.trim();
+            if (!VALID_CODES.has(sanitized)) {
+              return { success: false, reason: "invalid" };
+            }
+            const activationDate = new Date();
+            return persistActivation(activationDate);
+          };
+
+          const renderLockScreen = () => {
+            if (document.getElementById("license-lock-overlay")) {
+              return;
+            }
+
+            const render = () => {
+              const previousOverflow = document.body ? document.body.style.overflow : "";
+              const overlay = document.createElement("div");
+              overlay.id = "license-lock-overlay";
+              overlay.setAttribute("role", "dialog");
+              overlay.setAttribute("aria-modal", "true");
+              overlay.setAttribute("aria-labelledby", "license-lock-title");
+              overlay.style.position = "fixed";
+              overlay.style.top = "0";
+              overlay.style.left = "0";
+              overlay.style.width = "100%";
+              overlay.style.height = "100%";
+              overlay.style.background = "rgba(2, 6, 23, 0.95)";
+              overlay.style.display = "flex";
+              overlay.style.flexDirection = "column";
+              overlay.style.alignItems = "center";
+              overlay.style.justifyContent = "center";
+              overlay.style.zIndex = "9999";
+              overlay.style.padding = "2rem";
+
+              overlay.innerHTML = `
+                <form id="license-lock-form" style="display:flex;flex-direction:column;align-items:center;gap:1rem;max-width:320px;width:100%;">
+                  <h2 id="license-lock-title" style="color:white;font-size:1.5rem;text-align:center;">Zantra Bookings Locked</h2>
+                  <p data-license-message style="color:${INFO_COLOR};text-align:center;font-size:0.95rem;line-height:1.4;">
+                    Enter your license code to unlock Zantra Bookings. Activation lasts 12 months.
+                  </p>
+                  <label for="license-input" class="sr-only">License code</label>
+                  <input
+                    id="license-input"
+                    type="text"
+                    autocomplete="one-time-code"
+                    placeholder="Enter license code"
+                    style="padding:0.75rem 1rem;border-radius:0.75rem;border:1px solid rgba(148,163,184,0.35);background:rgba(15,23,42,0.95);color:white;width:100%;"
+                    aria-required="true"
+                  />
+                  <button
+                    type="submit"
+                    style="padding:0.75rem 1.5rem;border-radius:0.75rem;background:#4b0082;color:white;font-weight:600;border:none;width:100%;box-shadow:0 12px 30px rgba(76,29,149,0.35);"
+                  >Unlock</button>
+                </form>
+              `;
+
+              if (document.body) {
+                document.body.dataset.licenseLocked = "true";
+                document.body.style.overflow = "hidden";
+                document.body.appendChild(overlay);
+              } else {
+                document.documentElement.appendChild(overlay);
+              }
+
+              const form = overlay.querySelector("#license-lock-form");
+              const input = overlay.querySelector("#license-input");
+              const message = overlay.querySelector('[data-license-message]');
+
+              const resetMessage = () => {
+                if (message) {
+                  message.textContent = "Enter your license code to unlock Zantra Bookings. Activation lasts 12 months.";
+                  message.style.color = INFO_COLOR;
+                }
+              };
+
+              const cleanup = () => {
+                if (document.body?.dataset.licenseLocked) {
+                  delete document.body.dataset.licenseLocked;
+                }
+                if (document.body) {
+                  document.body.style.overflow = previousOverflow;
+                }
+                overlay.remove();
+              };
+
+              if (input) {
+                requestAnimationFrame(() => {
+                  input.focus();
+                  input.setSelectionRange(input.value.length, input.value.length);
+                });
+                input.addEventListener("input", () => {
+                  resetMessage();
+                });
+              }
+
+              if (form) {
+                form.addEventListener("submit", (event) => {
+                  event.preventDefault();
+                  const value = input ? input.value : "";
+                  const result = activate(value);
+                  if (!result.success) {
+                    if (message) {
+                      message.textContent =
+                        result.reason === "storage"
+                          ? "Unable to store license information. Please enable localStorage and try again."
+                          : "Invalid license code. Please try again.";
+                      message.style.color = ERROR_COLOR;
+                    }
+                    if (input) {
+                      input.setAttribute("aria-invalid", "true");
+                      input.focus();
+                      input.select();
+                    }
+                    return;
+                  }
+
+                  if (input) {
+                    input.removeAttribute("aria-invalid");
+                  }
+                  if (message) {
+                    message.textContent = "License activated. Reloading Zantra Bookings…";
+                    message.style.color = SUCCESS_COLOR;
+                  }
+                  cleanup();
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 300);
+                });
+              }
+            };
+
+            if (document.readyState === "loading") {
+              document.addEventListener("DOMContentLoaded", render, { once: true });
+            } else {
+              render();
+            }
+          };
+
+          const enforce = () => {
+            if (isLicenseValid()) {
+              return true;
+            }
+            renderLockScreen();
+            return false;
+          };
+
+          const reset = () => {
+            if (!canUseStorage()) return;
+            try {
+              window.localStorage.removeItem(STORAGE_KEY);
+            } catch (error) {
+              console.error("Failed to reset license", error);
+            }
+          };
+
+          return {
+            activate,
+            enforce,
+            isLicenseValid,
+            reset,
+          };
+        })();
+
+        window.ZantraLicense = LicenseManager;
+        if (!LicenseManager.enforce()) {
+          return;
+        }
 
         const defaultState = {
           bookings: [],
