@@ -1048,9 +1048,9 @@
                 <option value="cancelled">Cancelled</option>
               </select>
             </div>
-            <div class="grid grid-cols-2 gap-3 w-full">
-              <button type="submit" class="btn btn-primary">Save Booking</button>
-              <button type="reset" class="btn btn-outline">Reset</button>
+            <div class="action-bar w-full">
+              <button type="submit" class="btn btn-primary w-full">Save Booking</button>
+              <button type="reset" class="btn btn-outline w-full">Reset</button>
             </div>
           </form>
         </div>
@@ -1110,9 +1110,9 @@
                 <option value="overdue">Overdue</option>
               </select>
             </div>
-            <div class="grid grid-cols-2 gap-3 w-full">
-              <button type="submit" class="btn btn-primary">Save Invoice</button>
-              <button type="reset" id="invoiceReset" class="btn btn-outline">Reset</button>
+            <div class="action-bar w-full">
+              <button type="submit" class="btn btn-primary w-full">Save Invoice</button>
+              <button type="reset" id="invoiceReset" class="btn btn-outline w-full">Reset</button>
             </div>
             <div class="grid grid-cols-1 gap-3 w-full">
               <label class="input-label" for="invoiceNotes">Notes</label>
@@ -1162,9 +1162,9 @@
               <label class="input-label" for="brandColor">Brand Accent</label>
               <input id="brandColor" class="input" type="color" />
             </div>
-            <div class="grid grid-cols-2 gap-3 w-full">
-              <button type="submit" class="btn btn-primary">Save Branding</button>
-              <button type="button" id="resetBranding" class="btn btn-outline">Reset Theme</button>
+            <div class="action-bar w-full">
+              <button type="submit" class="btn btn-primary w-full">Save Branding</button>
+              <button type="button" id="resetBranding" class="btn btn-outline w-full">Reset Theme</button>
             </div>
           </form>
         </div>
@@ -1225,7 +1225,7 @@
         <div class="card mt-6">
           <h2 class="section-title">Backup &amp; Restore</h2>
           <p class="section-subtext">Export or import your Zantra Bookings data as JSON.</p>
-          <div class="flex flex-wrap gap-3 mt-4">
+          <div class="action-bar mt-4">
             <button id="exportData" class="btn btn-primary">Export Data</button>
             <label class="btn btn-outline" for="importFile">Import JSON</label>
             <input id="importFile" type="file" accept="application/json" class="hidden" />
@@ -1670,8 +1670,10 @@
                 </span>
               </td>
               <td class="text-right">
-                <button class="btn btn-outline text-sm" data-action="edit" data-id="${booking.id}">Edit</button>
-                <button class="btn btn-danger text-sm" data-action="delete" data-id="${booking.id}">Delete</button>
+                <div class="action-bar justify-end">
+                  <button class="btn btn-outline" data-action="edit" data-id="${booking.id}">Edit</button>
+                  <button class="btn btn-danger" data-action="delete" data-id="${booking.id}">Delete</button>
+                </div>
               </td>
             `;
             tbody.appendChild(tr);
@@ -1706,11 +1708,11 @@
               </div>
               <p class="text-sm text-muted">Balance: $${balance.toFixed(2)} · Total Paid: $${totalPaid.toFixed(2)}</p>
               ${invoice.notes ? `<p class="text-sm">${invoice.notes}</p>` : ''}
-              <div class="flex flex-wrap gap-3 mt-2">
-                <button class="btn btn-outline text-sm" data-action="edit" data-id="${invoice.id}">Edit</button>
-                <button class="btn btn-primary text-sm" data-action="payment" data-id="${invoice.id}">Add Payment</button>
-                <button class="btn btn-secondary text-sm" data-action="pdf" data-id="${invoice.id}">Generate PDF</button>
-                <button class="btn btn-danger text-sm" data-action="delete" data-id="${invoice.id}">Delete</button>
+              <div class="action-bar mt-2">
+                <button class="btn btn-outline" data-action="edit" data-id="${invoice.id}">Edit</button>
+                <button class="btn btn-primary" data-action="payment" data-id="${invoice.id}">Add Payment</button>
+                <button class="btn btn-secondary" data-action="pdf" data-id="${invoice.id}">Generate PDF</button>
+                <button class="btn btn-danger" data-action="delete" data-id="${invoice.id}">Delete</button>
               </div>
               <div class="mt-2">
                 <p class="text-sm text-muted font-medium">Payments</p>
@@ -1726,10 +1728,12 @@
                                     <p class="text-sm font-medium">${payment.method} · ${payment.date}</p>
                                     <p class="text-xs text-muted">Recorded ${new Date(payment.createdAt).toLocaleString()}</p>
                                   </div>
-                                  <div class="flex gap-2">
+                                  <div class="flex items-center gap-3">
                                     <span class="badge badge-success">$${Number(payment.amount).toFixed(2)}</span>
-                                    <button class="btn btn-outline text-xs" data-action="edit-payment" data-id="${payment.id}">Edit</button>
-                                    <button class="btn btn-danger text-xs" data-action="delete-payment" data-id="${payment.id}">Delete</button>
+                                    <div class="action-bar">
+                                      <button class="btn btn-outline" data-action="edit-payment" data-id="${payment.id}">Edit</button>
+                                      <button class="btn btn-danger" data-action="delete-payment" data-id="${payment.id}">Delete</button>
+                                    </div>
                                   </div>
                                 </div>
                               </li>
